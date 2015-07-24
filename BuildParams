@@ -1,0 +1,14 @@
+# BuildParams
+#
+# Please refer to:
+#  https://wiki.secondlife.com/wiki/Automated_Build_System
+
+# Do *not* use Public Upload location for this package
+public_build = false
+
+# autobuild uses VS2015
+# Note: we actually do not build anything for fmod so the Windows binary is using whatever
+# compiler was used by the fmod folks
+AUTOBUILD_VSVER=140
+
+# eof
