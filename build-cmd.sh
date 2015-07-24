@@ -32,7 +32,7 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     "windows64")
     CEF_PLATFORM="windows64"
-	CEF_VERSION="3.2357.1276.gd4b589c" # override for win64 as its slightly out of date
+    CEF_VERSION="3.2357.1276.gd4b589c" # override for win64 as its slightly out of date
     CEF_MD5="44542b1828e212e11549d5f8297c56ed"
     ;;
     "darwin")
@@ -62,8 +62,8 @@ case "${CEF_ARCHIVE}" in
 esac
 
 stage="$(pwd)/stage"
-stage_bin_release="$stage/lib/release"
-stage_bin_debug="$stage/lib/debug"
+stage_bin_release="$stage/bin/release"
+stage_bin_debug="$stage/bin/debug"
 stage_lib_release="$stage/lib/release"
 stage_lib_debug="$stage/lib/debug"
 
@@ -79,20 +79,44 @@ mkdir -p "$stage_bin_release"
 mkdir -p "$stage_lib_debug"
 mkdir -p "$stage_lib_release"
 
+#Create the staging resource dir
+mkdir -p "$stage/resources"
+
 echo "${CEF_VERSION}" > "${stage}/VERSION.txt"
 
 case "$AUTOBUILD_PLATFORM" in
     "windows")
-		pushd "cef"
+        pushd "cef"
             sed -i -- 's/\/MT/\/MD/' CMakeLists.txt
-			sed -i -- 's/\/wd\\\"4244\\\"/\/wd\\\"4244\\\"\ \/wd\\\"4456\\\"\ \/wd\\\"4458\\\"/' CMakeLists.txt
-			mkdir build
-			pushd "build"
-				cmake -G "Visual Studio 14" ..
+            sed -i -- 's/\/wd\\\"4244\\\"/\/wd\\\"4244\\\"\ \/wd\\\"4456\\\"\ \/wd\\\"4458\\\"/' CMakeLists.txt
+            mkdir build
+            pushd "build"
+                cmake -G "Visual Studio 14" ..
                 build_sln "cef.sln" "Debug|Win32" "libcef_dll_wrapper"
                 build_sln "cef.sln" "Release|Win32" "libcef_dll_wrapper"
+                
+                cp libcef_dll/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
+                cp libcef_dll/Release/libcef_dll_wrapper.* "$stage_lib_release"
+            popd
+            cp Debug/* "$stage_bin_debug"
+            cp Release/* "$stage_bin_release"
+            cp -R Resources/* "$stage/resources"
+        popd
+        pushd "llceflib"
+            mkdir build
+            pushd "build"
+                cmake -G "Visual Studio 14" ..
+                build_sln "llceflib.sln" "Debug|Win32"
+                build_sln "llceflib.sln" "Release|Win32"
+				
+				cp "lib/Debug/llceflib*" "$stage_lib_debug"
+				cp "lib/Release/llceflib*" "$stage_lib_release"
+				
+				cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
+				cp "bin/Release/llceflib_host.exe" "$stage_bin_release"
 			popd
-		popd
+			cp "llceflib.h" "$stage/include/cef"
+        popd
     ;;
     "windows64")
     ;;
