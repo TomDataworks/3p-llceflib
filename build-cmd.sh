@@ -92,8 +92,8 @@ case "$AUTOBUILD_PLATFORM" in
             mkdir build
             pushd "build"
                 cmake -G "Visual Studio 14" ..
-                build_sln "cef.sln" "Debug|Win32" "libcef_dll_wrapper"
-                build_sln "cef.sln" "Release|Win32" "libcef_dll_wrapper"
+                build_sln "cef.sln" "Debug" "Win32" "libcef_dll_wrapper"
+                build_sln "cef.sln" "Release" "Win32" "libcef_dll_wrapper"
                 
                 cp libcef_dll/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
                 cp libcef_dll/Release/libcef_dll_wrapper.* "$stage_lib_release"
@@ -106,16 +106,17 @@ case "$AUTOBUILD_PLATFORM" in
             mkdir build
             pushd "build"
                 cmake -G "Visual Studio 14" ..
-                build_sln "llceflib.sln" "Debug|Win32"
-                build_sln "llceflib.sln" "Release|Win32"
-				
-				cp "lib/Debug/llceflib*" "$stage_lib_debug"
-				cp "lib/Release/llceflib*" "$stage_lib_release"
-				
-				cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
-				cp "bin/Release/llceflib_host.exe" "$stage_bin_release"
-			popd
-			cp "llceflib.h" "$stage/include/cef"
+                build_sln "llceflib.sln" "Debug" "Win32"
+                build_sln "llceflib.sln" "Release" "Win32"
+                
+                cp "lib/Debug/llceflib.lib" "$stage_lib_debug"
+                cp "lib/Debug/llceflib.pdb" "$stage_lib_debug"
+                cp "lib/Release/llceflib.lib" "$stage_lib_release"
+                
+                cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
+                cp "bin/Release/llceflib_host.exe" "$stage_bin_release"
+            popd
+            cp "llceflib.h" "$stage/include/cef"
         popd
     ;;
     "windows64")
