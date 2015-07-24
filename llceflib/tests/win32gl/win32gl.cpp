@@ -27,11 +27,8 @@
 #include <string>
 #include <iostream>
 
-#include "boost/function.hpp"
-#include "boost/bind.hpp"
-
-#include <gl\gl.h>
-#include "../../llCEFLib.h"
+#include <gl/gl.h>
+#include "../../llceflib.h"
 
 int mAppWindowWidth = 1024;
 int mAppWindowHeight = 1024;
@@ -81,7 +78,7 @@ void init( HWND hWnd )
 {
 	mLLCEFLib = new LLCEFLib();
 
-	mLLCEFLib->setPageChangedCallback(boost::bind(pageChangedCallback, _1, _2, _3));
+	mLLCEFLib->setPageChangedCallback(std::bind(pageChangedCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
 	LLCEFLibSettings settings;
 	settings.inital_width = gTextureWidth;
