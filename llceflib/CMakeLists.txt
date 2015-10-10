@@ -8,8 +8,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 if(MSVC)
 set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/debug/libcef_dll_wrapper.lib
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/release/libcef_dll_wrapper.lib
-             debug ${CMAKE_CURRENT_SOURCE_DIR}/../stage/bin/debug/libcef.lib
-             optimized ${CMAKE_CURRENT_SOURCE_DIR}/../stage/bin/release/libcef.lib)
+             debug ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/debug/libcef.lib
+             optimized ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/release/libcef.lib)
 endif(MSVC)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../cef)

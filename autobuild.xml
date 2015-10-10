@@ -39,7 +39,8 @@
           <key>manifest</key>
           <array>
             <string>include/*</string>
-            <string>LICENSES/llceflib.txt</string>
+            <string>LICENSES/*.txt</string>
+            <string>resources/*</string>
           </array>
           <key>name</key>
           <string>common</string>
@@ -120,6 +121,8 @@
           </map>
           <key>manifest</key>
           <array>
+            <string>bin/debug/*</string>
+            <string>bin/release/*</string>
             <string>lib/debug/*</string>
             <string>lib/release/*</string>
           </array>
@@ -142,6 +145,8 @@
           </map>
           <key>manifest</key>
           <array>
+            <string>bin/debug/*</string>
+            <string>bin/release/*</string>
             <string>lib/debug/*</string>
             <string>lib/release/*</string>
           </array>

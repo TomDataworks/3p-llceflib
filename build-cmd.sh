@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CEF_NAME="llceflib"
-CEF_VERSION="3.2357.1281.gd660177"
+CEF_VERSION_MAIN="3.2454"
 
 cd "$(dirname "$0")"
 
@@ -26,31 +26,35 @@ set -x
 
 # Form the cef archive URL to fetch
 case "$AUTOBUILD_PLATFORM" in
-    "windows")
-    CEF_PLATFORM="windows32"
-    CEF_MD5="7096677dafbec5e4bd4b826c59b95778"
-    ;;
-    "windows64")
-    CEF_PLATFORM="windows64"
-    CEF_VERSION="3.2357.1276.gd4b589c" # override for win64 as its slightly out of date
-    CEF_MD5="44542b1828e212e11549d5f8297c56ed"
-    ;;
     "darwin")
     CEF_PLATFORM="macosx64"
-    CEF_MD5="6916ebc14b6582760f9bf248a72a0ad3"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1320.g807de3c"
+    CEF_MD5="c4f2fd534dc272d82c174e2a81fa6e02"
     ;;
     "linux")
     CEF_PLATFORM="linux32"
-    CEF_MD5="822535d5d288afa8d9524fbfa72721ca"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1329.g29055f6"
+    CEF_MD5="bd2600a175d6c035cef87a96ae7234ad"
     ;;
     "linux64")
-    CEF_PLATFORM="linux32"
-    CEF_MD5="0b6ea1c668ee61b2ed73e3c88264008a"
+    CEF_PLATFORM="linux64"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1329.g29055f6"
+    CEF_MD5="c56545f3af0f6d16a06de3a5b53dc96a"
+    ;;
+    "windows")
+    CEF_PLATFORM="windows32"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1328.gc45b7de"
+    CEF_MD5="7b11899be4eae49ffaa48648adf411bd"
+    ;;
+    "windows64")
+    CEF_PLATFORM="windows64"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1329.g29055f6"
+    CEF_MD5="813b5be8b0916c05d09341ded9edf5af"
     ;;
 esac
-CEF_FOLDER_NAME="cef_binary_${CEF_VERSION}_${CEF_PLATFORM}"
+CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
 CEF_ARCHIVE="${CEF_FOLDER_NAME}.7z"
-CEF_URL="http://depot.alchemyviewer.org/pub/temp/${CEF_ARCHIVE}"
+CEF_URL="http://depot.alchemyviewer.org/pub/cef/${CEF_ARCHIVE}"
 
 # Fetch and extract the cef archive
 fetch_archive "${CEF_URL}" "${CEF_ARCHIVE}" "${CEF_MD5}"
@@ -82,9 +86,15 @@ mkdir -p "$stage_lib_release"
 #Create the staging resource dir
 mkdir -p "$stage/resources"
 
-echo "${CEF_VERSION}" > "${stage}/VERSION.txt"
+echo "${CEF_VERSION_FULL}" > "${stage}/VERSION.txt"
 
 case "$AUTOBUILD_PLATFORM" in
+    "darwin")
+    ;;
+    "linux")
+     ;;
+    "linux64")
+    ;;
     "windows")
         pushd "cef"
             sed -i -- 's/\/MT/\/MD/' CMakeLists.txt
@@ -98,8 +108,12 @@ case "$AUTOBUILD_PLATFORM" in
                 cp libcef_dll/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
                 cp libcef_dll/Release/libcef_dll_wrapper.* "$stage_lib_release"
             popd
-            cp Debug/* "$stage_bin_debug"
-            cp Release/* "$stage_bin_release"
+            cp Debug/*.dll "$stage_bin_debug"
+            cp Debug/*.bin "$stage_bin_debug"
+            cp Debug/libcef.lib "$stage_lib_debug"
+            cp Release/*.dll "$stage_bin_release"
+            cp Release/*.bin "$stage_bin_release"
+            cp Release/libcef.lib "$stage_lib_release"
             cp -R Resources/* "$stage/resources"
         popd
         pushd "llceflib"
@@ -116,21 +130,52 @@ case "$AUTOBUILD_PLATFORM" in
                 cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
                 cp "bin/Release/llceflib_host.exe" "$stage_bin_release"
             popd
-            cp "llceflib.h" "$stage/include/cef"
         popd
     ;;
     "windows64")
-    ;;
-    "darwin")
-    ;;
-    "linux")
-     ;;
-    "linux64")
+        pushd "cef"
+            sed -i -- 's/\/MT/\/MD/' CMakeLists.txt
+            sed -i -- 's/\/wd\\\"4244\\\"/\/wd\\\"4244\\\"\ \/wd\\\"4456\\\"\ \/wd\\\"4458\\\"/' CMakeLists.txt
+            mkdir build
+            pushd "build"
+                cmake -G "Visual Studio 14 Win64" ..
+                build_sln "cef.sln" "Debug" "x64" "libcef_dll_wrapper"
+                build_sln "cef.sln" "Release" "x64" "libcef_dll_wrapper"
+                
+                cp libcef_dll/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
+                cp libcef_dll/Release/libcef_dll_wrapper.* "$stage_lib_release"
+            popd
+            cp Debug/*.dll "$stage_bin_debug"
+            cp Debug/*.bin "$stage_bin_debug"
+            cp Debug/libcef.lib "$stage_lib_debug"
+            cp Release/*.dll "$stage_bin_release"
+            cp Release/*.bin "$stage_bin_release"
+            cp Release/libcef.lib "$stage_lib_release"
+            cp -R Resources/* "$stage/resources"
+        popd
+        pushd "llceflib"
+            mkdir build
+            pushd "build"
+                cmake -G "Visual Studio 14 Win64" ..
+                build_sln "llceflib.sln" "Debug" "x64"
+                build_sln "llceflib.sln" "Release" "x64"
+                
+                cp "lib/Debug/llceflib.lib" "$stage_lib_debug"
+                cp "lib/Debug/llceflib.pdb" "$stage_lib_debug"
+                cp "lib/Release/llceflib.lib" "$stage_lib_release"
+                
+                cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
+                cp "bin/Release/llceflib_host.exe" "$stage_bin_release"
+            popd
+        popd
     ;;
 esac
 
-    # Copy the headers
-    # Copy License (extracted from the readme)
+# Copy the headers
+cp "llceflib/llceflib.h" "$stage/include/cef"
+
+# Copy License (extracted from the readme)
+cp LICENSES/*.txt "$stage/LICENSES"
 
 pass
 
