@@ -30,6 +30,16 @@
                 <key>command</key>
                 <string>bash</string>
               </map>
+              <key>configure</key>
+              <map>
+                <key>command</key>
+                <string>bash</string>
+                <key>options</key>
+                <array>
+                  <string>-c</string>
+                  <string>../configure-cmd.sh</string>
+                </array>
+              </map>
               <key>default</key>
               <boolean>true</boolean>
               <key>name</key>
@@ -59,9 +69,6 @@
               <string>default</string>
             </map>
           </map>
-          <key>manifest</key>
-          <array>
-          </array>
           <key>name</key>
           <string>darwin</string>
         </map>
@@ -79,9 +86,6 @@
               <string>default</string>
             </map>
           </map>
-          <key>manifest</key>
-          <array>
-          </array>
           <key>name</key>
           <string>linux</string>
         </map>
@@ -99,9 +103,6 @@
               <string>default</string>
             </map>
           </map>
-          <key>manifest</key>
-          <array>
-          </array>
           <key>name</key>
           <string>linux64</string>
         </map>
