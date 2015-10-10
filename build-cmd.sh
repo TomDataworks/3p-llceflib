@@ -90,10 +90,15 @@ echo "${CEF_VERSION_FULL}" > "${stage}/VERSION.txt"
 
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
+
     ;;
     "linux")
+        echo "Not implemented"
+        fail
      ;;
     "linux64")
+        echo "Not implemented"
+        fail
     ;;
     "windows")
         pushd "cef"
