@@ -12,6 +12,10 @@ set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/debug/libcef_dll_wra
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/release/libcef.lib)
 endif(MSVC)
 
+if(APPLE)
+    set(CMAKE_CXX_FLAGS "-Wno-c++11-extensions")
+endif(APPLE)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../cef)
 
 set(llceflib_SOURCE_FILES
