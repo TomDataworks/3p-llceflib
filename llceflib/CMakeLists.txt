@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.1.0)
 project(llceflib)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -11,10 +14,6 @@ set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/debug/libcef_dll_wra
              debug ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/debug/libcef.lib
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../stage/lib/release/libcef.lib)
 endif(MSVC)
-
-if(APPLE)
-    set(CMAKE_CXX_FLAGS "-Wno-c++11-extensions")
-endif(APPLE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../cef)
 
