@@ -1,5 +1,7 @@
 syntax: glob
 
+cef/
 cef_binary*
+llceflib/build/
 stage
 
