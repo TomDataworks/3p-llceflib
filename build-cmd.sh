@@ -90,7 +90,12 @@ echo "${CEF_VERSION_FULL}" > "${stage}/VERSION.txt"
 
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
-
+        pushd "cef"
+            export GYP_GENERATORS=ninja
+            #sh ./cef_create_projects.sh 
+            cmake -G "Ninja" .
+            ninja cefclient
+        popd
     ;;
     "linux")
         echo "Not implemented"
