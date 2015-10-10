@@ -28,8 +28,6 @@
 
 #include "llrenderhandler.h"
 #include "llbrowserclient.h"
-#include "llbrowserevents.h"
-
 #include "llceflibimpl.h"
 
 LLBrowserClient::LLBrowserClient(LLCEFLibImpl* parent, LLRenderHandler *render_handler) :
@@ -44,6 +42,82 @@ CefRefPtr<CefRenderHandler> LLBrowserClient::GetRenderHandler()
     return mLLRenderHandler;
 }
 
+#if (CEF_CURRENT_BRANCH >= CEF_BRANCH_2357)
+bool LLBrowserClient::OnBeforePopup(CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame,
+	const CefString& target_url,
+	const CefString& target_frame_name,
+	CefLifeSpanHandler::WindowOpenDisposition target_disposition,
+	bool user_gesture,
+	const CefPopupFeatures& popupFeatures,
+	CefWindowInfo& windowInfo,
+	CefRefPtr<CefClient>& client,
+	CefBrowserSettings& settings,
+	bool* no_javascript_access)
+#else
+bool LLBrowserClient::OnBeforePopup(CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame,
+	const CefString& target_url,
+	const CefString& target_frame_name,
+	const CefPopupFeatures& popupFeatures,
+	CefWindowInfo& windowInfo,
+	CefRefPtr<CefClient>& client,
+	CefBrowserSettings& settings,
+	bool* no_javascript_access)
+#endif
+{
+	CEF_REQUIRE_IO_THREAD();
+
+#ifdef LLCEFLIB_DEBUG
+	std::cout << "LLBrowserClient::OnBeforePopup" << std::endl;
+	std::cout << "Target frame is " << std::string(target_frame_name) << std::endl;
+#endif
+
+	// links with a target will not be browsed to - up to caller to kick off 
+	// another navigate event if they want to visit that URL
+	std::string url = std::string(target_url);
+	std::string target = std::string(target_frame_name);
+	if (target.length())
+	{
+		mParent->onNavigateURL(url, target);
+		return true;
+	}
+
+	browser->GetMainFrame()->LoadURL(target_url);
+
+	return true;
+}
+
+void LLBrowserClient::OnAfterCreated(CefRefPtr<CefBrowser> browser)
+{
+	CEF_REQUIRE_UI_THREAD();
+
+#ifdef LLCEFLIB_DEBUG
+	std::cout << "LLBrowserClient::OnAfterCreated" << std::endl;
+#endif
+}
+
+bool LLBrowserClient::RunModal(CefRefPtr<CefBrowser> browser)
+{
+	CEF_REQUIRE_UI_THREAD();
+
+#ifdef LLCEFLIB_DEBUG
+	std::cout << "LLBrowserClient::RunModal" << std::endl;
+#endif
+
+	return false;
+}
+
+bool LLBrowserClient::DoClose(CefRefPtr<CefBrowser> browser)
+{
+	CEF_REQUIRE_UI_THREAD();
+
+#ifdef LLCEFLIB_DEBUG
+	std::cout << "LLBrowserClient::DoClose" << std::endl;
+#endif
+	return false;
+}
+
 bool LLBrowserClient::OnConsoleMessage(CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line)
 {
     CEF_REQUIRE_UI_THREAD();
@@ -55,11 +129,20 @@ bool LLBrowserClient::OnConsoleMessage(CefRefPtr<CefBrowser> browser, const CefS
     return true;
 }
 
+void LLBrowserClient::OnAddressChange(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& url)
+{
+	CEF_REQUIRE_UI_THREAD();
+
+	std::string new_url = url;
+	mParent->onAddressChange(new_url);
+}
+
 void LLBrowserClient::OnStatusMessage(CefRefPtr<CefBrowser> browser, const CefString& value)
 {
     CEF_REQUIRE_UI_THREAD();
 
     std::string value_str = value;
+
     mParent->onStatusMessage(value_str);
 }
 
@@ -94,7 +177,31 @@ bool LLBrowserClient::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<Ce
 	CEF_REQUIRE_UI_THREAD();
 	std::string url = request->GetURL();
 
-	mParent->onNavigateURL(url);
+	// for conmparison
+	std::transform(url.begin(), url.end(), url.begin(), ::tolower);
+
+	std::vector<std::string>::iterator iter = mParent->getCustomSchemes().begin();
+	while (iter != mParent->getCustomSchemes().end())
+	{
+		if (url.substr(0, (*iter).length()) == (*iter))
+		{
+			// get URL again since we lower cased it for comparison
+			url = request->GetURL();
+			mParent->onCustomSchemeURL(url);
+
+			// don't continute with navigation
+			return true;
+		}
+
+		++iter;
+	}
+
+	// might think this is the right approach to trigger a callback to say we're navigating 
+	// but this causes a catastophic loop in SL where it sends a navigate request when it
+	// gets this callback.  For the moment, until i can unravel all that, I'm just not sending it here.
+	// It is send for links with a target.
+	//std::string link_target("");
+	//mParent->onNavigateURL(url, link_target);
 
 	// continue with navigation
 	return false;
@@ -103,7 +210,7 @@ bool LLBrowserClient::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<Ce
 bool LLBrowserClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, bool isProxy, 
 	const CefString& host, int port, const CefString& realm, const CefString& scheme, CefRefPtr<CefAuthCallback> callback)
 {
-	CEF_REQUIRE_UI_THREAD();
+	CEF_REQUIRE_IO_THREAD();
 
 	std::string host_str = host;
 	std::string realm_str = realm;
@@ -113,21 +220,25 @@ bool LLBrowserClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser, CefRefPt
 	std::string password="";
 	bool proceed = mParent->onHTTPAuth(host_str, realm_str, username, password);
 
-	CefRefPtr<LLCEFLibAuthCredentials> cred = new LLCEFLibAuthCredentials(isProxy, host, port, realm, scheme, callback);
 	if (proceed)
 	{
-		cred->proceed(username.c_str(), password.c_str());
+		callback->Continue(username.c_str(), password.c_str());
 		return true; // continue with request
 	}
 	else
 	{
-		cred->cancel();
+		callback->Cancel();
 		return false; // cancel request
 	}
 }
 
 void LLBrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
+	CEF_REQUIRE_UI_THREAD();
+
+#ifdef LLCEFLIB_DEBUG
+	std::cout << "LLBrowserClient::OnBeforeClose - set mIsBrowserClosing = true; " << std::endl;
+#endif
 	mIsBrowserClosing = true;
 }
 

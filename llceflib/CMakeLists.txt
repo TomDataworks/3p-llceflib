@@ -16,7 +16,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../cef)
 
 set(llceflib_SOURCE_FILES
 llbrowserclient.cpp
-llbrowserevents.cpp
 llceflib.cpp
 llceflibimpl.cpp
 llrenderhandler.cpp
@@ -31,7 +30,6 @@ endif(WIN32)
 
 set(llceflib_HEADER_FILES
 llbrowserclient.h
-llbrowserevents.h
 llceflib.h
 llceflibimpl.h
 llrenderhandler.h

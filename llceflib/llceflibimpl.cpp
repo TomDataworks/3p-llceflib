@@ -42,13 +42,17 @@ LLCEFLibImpl::LLCEFLibImpl() :
     mViewHeight(0),
     mBrowser(0)
 {
+	// default is second life scheme
+    std::vector<std::string> default_schemes;
+    default_schemes.push_back("secondlife://"); // bah - clang doesn't like the explicit initialization form
+	mCustomSchemes = default_schemes;
 }
 
 LLCEFLibImpl::~LLCEFLibImpl()
 {
 }
 
-bool LLCEFLibImpl::init(LLCEFLibSettings& user_settings)
+bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 {
 #ifdef LLCEFLIB_DEBUG
     std::cout << "Starting.." << std::endl;
@@ -62,6 +66,7 @@ bool LLCEFLibImpl::init(LLCEFLibSettings& user_settings)
 
 
     CefSettings settings;
+
 #ifdef WIN32
     CefString(&settings.browser_subprocess_path) = "llceflib_host.exe";
 #elif __APPLE__
@@ -85,15 +90,24 @@ bool LLCEFLibImpl::init(LLCEFLibSettings& user_settings)
 	// feature not supported on revision of OS X CEF we are locked to in 32 bit land
 #endif
 
-    bool result = CefInitialize(args, settings, NULL, NULL);
+	// set path to cache if enabled and set
+	if (user_settings.cache_enabled && user_settings.cache_path.length())
+	{
+		CefString(&settings.cache_path) = user_settings.cache_path;
+	}
+
+    bool result = CefInitialize(args, settings, this, NULL);
     if (! result)
     {
         return false;
     }
     
-    scheme_handler::RegisterSchemeHandlers(this);
+	// removed for now since the scheme handler as implemented is broken in rev 2357
+	// now schemes are caught via onBeforeBrowse override - when 2357 is fixed the code
+	// should revert to using a scheme hander vs a URL parser
+	//scheme_handler::RegisterSchemeHandlers(this);
     
-    setSize(user_settings.inital_width, user_settings.inital_height);
+    setSize(user_settings.initial_width, user_settings.initial_height);
         
     CefWindowInfo window_info;
     window_info.windowless_rendering_enabled = true;
@@ -106,32 +120,41 @@ bool LLCEFLibImpl::init(LLCEFLibSettings& user_settings)
     // change settings based on what was passed in
     browser_settings.javascript = user_settings.javascript_enabled ? STATE_ENABLED : STATE_DISABLED;
     browser_settings.plugins = user_settings.plugins_enabled ? STATE_ENABLED : STATE_DISABLED;
-    
+
     // CEF handler classes
     LLRenderHandler* renderHandler = new LLRenderHandler(this);
     mBrowserClient = new LLBrowserClient(this, renderHandler);
     
+	// if this is NULL for CreateBrowserSync, the global request context will be used
+	CefRefPtr<CefRequestContext> rc = NULL;
+
     // Add a custom context handler that implements a
     // CookieManager so cookies will persist to disk.
-    
+	// (if cookies enabled)
+	if (user_settings.cookies_enabled)
+	{
 #ifdef WIN32
-	std::string cookiePath = ".\\cookies";
+		std::string cookiePath = ".\\cookies";
+		if (user_settings.cookie_store_path.length())
+		{
+			cookiePath = std::string(user_settings.cookie_store_path);
+		}
 #elif __APPLE__
-    NSString* appDataDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex: 0];
-    std::string cookiePath = [[NSString stringWithFormat: @"%@/%@", appDataDirectory, @"llceflib_cookies"] UTF8String];
+		// TODO: pass on cookie path to OS X version too
+		NSString* appDataDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex: 0];
+		std::string cookiePath = [[NSString stringWithFormat: @"%@/%@", appDataDirectory, @"llceflib_cookies"] UTF8String];
 #endif
-    
-    // CEF changed interfaces between these two branches
-    // Can be removed once we decide on a release CEF version
+
+		// CEF changed interfaces between these two branches
 #if CEF_CURRENT_BRANCH >= CEF_BRANCH_2357
-    CefRequestContextSettings contextSettings;
-    
-	mContextHandler = new LLContextHandler(cookiePath.c_str());
-	CefRefPtr<CefRequestContext> rc = CefRequestContext::CreateContext(contextSettings, mContextHandler.get());
+		CefRequestContextSettings contextSettings;
+		mContextHandler = new LLContextHandler(cookiePath.c_str());
+		rc = CefRequestContext::CreateContext(contextSettings, mContextHandler.get());
 #else // CEF_BRANCH_2272
-    CefRefPtr<CefRequestContext> rc = CefRequestContext::CreateContext( new LLContextHandler(cookiePath.c_str()) );
+		rc = CefRequestContext::CreateContext(new LLContextHandler(cookiePath.c_str()));
 #endif
-    
+	}
+
     CefString url = "";
     mBrowser = CefBrowserHost::CreateBrowserSync(window_info, mBrowserClient.get(), url, browser_settings, rc);
     
@@ -140,16 +163,29 @@ bool LLCEFLibImpl::init(LLCEFLibSettings& user_settings)
 
 void LLCEFLibImpl::update()
 {
-    CefDoMessageLoopWork();
+	if (mBrowserClient)
+	{
+		CefDoMessageLoopWork();
 
-	if ( mBrowserClient )
-		if (mBrowserClient->isBrowserClosing() )
+		if (mBrowserClient->isBrowserClosing())
+		{
+			CefQuitMessageLoop();
+#ifdef LLCEFLIB_DEBUG
+			std::cout << "Update loop told to close, call CefShutdown() then call exit callback" << std::endl;
+#endif
 			CefShutdown();
+
+			mBrowserClient = 0;
+
+			// tell the app counsuming us it's okay to exit now
+			onRequestExit();
+		}
+	}
 }
 
-void LLCEFLibImpl::setPageChangedCallback(std::function<void(unsigned char*, int, int)> callback)
+void LLCEFLibImpl::setOnPageChangedCallback(std::function<void(unsigned char*, int, int)> callback)
 {
-    mPageChangedCallbackFunc = callback;
+    mOnPageChangedCallbackFunc = callback;
 }
 
 void LLCEFLibImpl::setOnCustomSchemeURLCallback(std::function<void(std::string)> callback)
@@ -162,9 +198,14 @@ void LLCEFLibImpl::setOnConsoleMessageCallback(std::function<void(std::string, s
     mOnConsoleMessageCallbackFunc = callback;
 }
 
+void LLCEFLibImpl::setOnAddressChangeCallback(std::function<void(std::string)> callback)
+{
+	mOnAddressChangeCallbackFunc = callback;
+}
+
 void LLCEFLibImpl::setOnStatusMessageCallback(std::function<void(std::string)> callback)
 {
-    mOnStatusMessageCallbackFunc = callback;
+	mOnStatusMessageCallbackFunc = callback;
 }
 
 void LLCEFLibImpl::setOnTitleChangeCallback(std::function<void(std::string)> callback)
@@ -177,12 +218,22 @@ void LLCEFLibImpl::setOnLoadStartCallback(std::function<void()> callback)
 	mOnLoadStartCallbackFunc = callback;
 }
 
+void LLCEFLibImpl::setOnRequestExitCallback(std::function<void()> callback)
+{
+	mOnRequestExitCallbackFunc = callback;
+}
+
+void LLCEFLibImpl::setOnCursorChangedCallback(std::function<void(LLCEFLib::ECursorType type, size_t)> callback)
+{
+	mOnCursorChangedCallbackFunc = callback;
+}
+
 void LLCEFLibImpl::setOnLoadEndCallback(std::function<void(int)> callback)
 {
 	mOnLoadEndCallbackFunc = callback;
 }
 
-void LLCEFLibImpl::setOnNavigateURLCallback(std::function<void(std::string)> callback)
+void LLCEFLibImpl::setOnNavigateURLCallback(std::function<void(std::string, std::string)> callback)
 {
 	mOnNavigateURLCallbackFunc = callback;
 }
@@ -209,10 +260,10 @@ void LLCEFLibImpl::getSize(int& width, int& height)
     height = mViewHeight;
 }
 
-void LLCEFLibImpl::pageChanged(unsigned char* pixels, int width, int height)
+void LLCEFLibImpl::onPageChanged(unsigned char* pixels, int width, int height)
 {
-    if(mPageChangedCallbackFunc)
-        mPageChangedCallbackFunc(pixels, width, height);
+    if(mOnPageChangedCallbackFunc)
+        mOnPageChangedCallbackFunc(pixels, width, height);
 }
 
 void LLCEFLibImpl::onCustomSchemeURL(std::string url)
@@ -227,10 +278,16 @@ void LLCEFLibImpl::onConsoleMessage(std::string message, std::string source, int
         mOnConsoleMessageCallbackFunc(message, source, line);
 }
 
+void LLCEFLibImpl::onAddressChange(std::string new_url)
+{
+	if (mOnAddressChangeCallbackFunc)
+		mOnAddressChangeCallbackFunc(new_url);
+}
+
 void LLCEFLibImpl::onStatusMessage(std::string value)
 {
-    if(mOnStatusMessageCallbackFunc)
-        mOnStatusMessageCallbackFunc(value);
+	if (mOnStatusMessageCallbackFunc)
+		mOnStatusMessageCallbackFunc(value);
 }
 
 void LLCEFLibImpl::onTitleChange(std::string title)
@@ -251,10 +308,22 @@ void LLCEFLibImpl::onLoadEnd(int httpStatusCode)
 		mOnLoadEndCallbackFunc(httpStatusCode);
 }
 
-void LLCEFLibImpl::onNavigateURL(std::string url)
+void LLCEFLibImpl::onNavigateURL(std::string url, std::string target)
 {
 	if (mOnNavigateURLCallbackFunc)
-		mOnNavigateURLCallbackFunc(url);
+		mOnNavigateURLCallbackFunc(url, target);
+}
+
+void LLCEFLibImpl::onRequestExit()
+{
+	if (mOnRequestExitCallbackFunc)
+		mOnRequestExitCallbackFunc();
+}
+
+void LLCEFLibImpl::onCursorChanged(LLCEFLib::ECursorType type, size_t cursor)
+{
+	if (mOnCursorChangedCallbackFunc)
+		mOnCursorChangedCallbackFunc(type, cursor);
 }
 
 bool LLCEFLibImpl::onHTTPAuth(const std::string host, const std::string realm, std::string& username, std::string& password)
@@ -289,31 +358,30 @@ void LLCEFLibImpl::setPageZoom(double zoom_val)
 	}
 }
 
-void LLCEFLibImpl::mouseButton(EMouseButton mouse_button, EMouseEvent mouse_event, int x, int y)
+void LLCEFLibImpl::mouseButton(LLCEFLib::EMouseButton mouse_button, LLCEFLib::EMouseEvent mouse_event, int x, int y)
 {
 	// select click location
     CefMouseEvent cef_mouse_event;
     cef_mouse_event.x = x;
     cef_mouse_event.y = y;
-	cef_mouse_event.modifiers = 0;
+	cef_mouse_event.modifiers = EVENTFLAG_LEFT_MOUSE_BUTTON;
 
 	// select button
 	CefBrowserHost::MouseButtonType btnType = MBT_LEFT;
-	if (mouse_button == MB_MOUSE_BUTTON_RIGHT) btnType = MBT_RIGHT;
-	if (mouse_button == MB_MOUSE_BUTTON_MIDDLE) btnType = MBT_MIDDLE;
+	if (mouse_button == LLCEFLib::MB_MOUSE_BUTTON_RIGHT) btnType = MBT_RIGHT;
+	if (mouse_button == LLCEFLib::MB_MOUSE_BUTTON_MIDDLE) btnType = MBT_MIDDLE;
 
 	// TODO: set this properly
     int last_click_count = 1;
 
 	// action TODO: extend to include "move" although this might be enough
 	bool is_down = false;
-	if (mouse_event == ME_MOUSE_DOWN) is_down = true;
-	if (mouse_event == ME_MOUSE_UP) is_down = false;
+	if (mouse_event == LLCEFLib::ME_MOUSE_DOWN) is_down = true;
+	if (mouse_event == LLCEFLib::ME_MOUSE_UP) is_down = false;
 
 	// send to CEF
 	if (mBrowser && mBrowser->GetHost())
 	{
-		std::cout << "Mouse button: " << (btnType == MBT_LEFT?"left":"other") << "  state: " << (is_down ? "down" : "up") << "   at " << x << ", " << y << std::endl;
 		mBrowser->GetHost()->SendMouseClickEvent(cef_mouse_event, btnType, is_down ? false : true, last_click_count);
 	}
 };
@@ -323,11 +391,10 @@ void LLCEFLibImpl::mouseMove(int x, int y)
     CefMouseEvent mouse_event;
     mouse_event.x = x;
     mouse_event.y = y;
-	mouse_event.modifiers = 0;
+	mouse_event.modifiers = EVENTFLAG_LEFT_MOUSE_BUTTON;
 
 	if (mBrowser && mBrowser->GetHost())
 	{
-		std::cout << "Mouse move at " << x << ", " << y << std::endl;
 		mBrowser->GetHost()->SendMouseMoveEvent(mouse_event, false);
 	}
 };
@@ -350,10 +417,14 @@ void LLCEFLibImpl::setFocus(bool focus)
 
 void LLCEFLibImpl::reset()
 {
-    bool force_close = true;
+#ifdef LLCEFLIB_DEBUG
+	std::cout << "Closing browser and flushing things" << std::endl;
+#endif
 
 	if (mContextHandler && mContextHandler->GetCookieManager())
 		mContextHandler->GetCookieManager()->FlushStore(NULL);
+
+	bool force_close = false;
 
 	if (mBrowser && mBrowser->GetHost())
 		mBrowser->GetHost()->CloseBrowser(force_close);
@@ -361,8 +432,20 @@ void LLCEFLibImpl::reset()
 
 void LLCEFLibImpl::OnRegisterCustomSchemes(CefRefPtr<CefSchemeRegistrar> registrar)
 {
-    // called when registering custom schemes
-    // TODO: what else do we need to do here?
+	// removed for now since the scheme handler as implemented is broken in rev 2357
+	// now schemes are caught via onBeforeBrowse override - when 2357 is fixed the code
+	// should revert to using a scheme hander vs a URL parser
+	//scheme_handler::RegisterCustomSchemes(registrar);
+}
+
+void LLCEFLibImpl::setCustomSchemes(std::vector<std::string> custom_schemes)
+{
+	mCustomSchemes = custom_schemes;
+}
+
+std::vector<std::string>& LLCEFLibImpl::getCustomSchemes()
+{
+	return mCustomSchemes;
 }
 
 void LLCEFLibImpl::stop()
@@ -430,9 +513,51 @@ bool LLCEFLibImpl::isLoading()
 {
     if(mBrowser && mBrowser->GetHost())
     {
-        mBrowser->IsLoading();
+        return mBrowser->IsLoading();
     }
 
     // default to allow so if UI is relies on it, this is still sensible
     return true;
+}
+
+bool LLCEFLibImpl::editCanCopy()
+{
+	// TODO: ask CEF if we can do this
+	return true;
+}
+
+bool LLCEFLibImpl::editCanCut()
+{
+	// TODO: ask CEF if we can do this
+	return true;
+}
+
+bool LLCEFLibImpl::editCanPaste()
+{
+	// TODO: ask CEF if we can do this
+	return true;
+}
+
+void LLCEFLibImpl::editCopy()
+{
+	if (mBrowser && mBrowser->GetFocusedFrame())
+	{
+		mBrowser->GetFocusedFrame()->Copy();
+	}
+}
+
+void LLCEFLibImpl::editCut()
+{
+	if (mBrowser && mBrowser->GetFocusedFrame())
+	{
+		mBrowser->GetFocusedFrame()->Cut();
+	}
+}
+
+void LLCEFLibImpl::editPaste()
+{
+	if (mBrowser && mBrowser->GetFocusedFrame())
+	{
+		mBrowser->GetFocusedFrame()->Paste();
+	}
 }

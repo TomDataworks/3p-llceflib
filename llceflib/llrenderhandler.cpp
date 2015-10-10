@@ -30,6 +30,33 @@
 LLRenderHandler::LLRenderHandler(LLCEFLibImpl* parent) :
     mParent(parent)
 {
+#ifdef FLIP_OUTPUT_Y
+	flipBufferWidth = 0;
+	flipBufferHeight = 0;
+	flipBufferDepth = parent->getDepth();
+	flipBuffer = 0;
+#endif
+}
+
+LLRenderHandler::~LLRenderHandler()
+{
+#ifdef FLIP_OUTPUT_Y
+	delete[]  flipBuffer;
+#endif
+}
+
+void LLRenderHandler::resizeFlipBuffer(int width, int height)
+{
+#ifdef FLIP_OUTPUT_Y
+	if (flipBufferWidth != width || flipBufferHeight != height)
+	{
+		delete[]  flipBuffer;
+		flipBufferWidth = width;
+		flipBufferHeight = height;
+		flipBuffer = new unsigned char[flipBufferWidth * flipBufferHeight * flipBufferDepth];
+		memset(flipBuffer, 0, flipBufferWidth * flipBufferHeight * flipBufferDepth);
+	}
+#endif
 }
 
 bool LLRenderHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
@@ -37,17 +64,34 @@ bool LLRenderHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
     int width, height;
     mParent->getSize(width, height);
 
+#ifdef FLIP_OUTPUT_Y
+	// change flip buffer size only if it changed
+	resizeFlipBuffer(width, height);
+#endif
+
     rect = CefRect(0, 0, width, height);
-    return true;
+
+	return true;
 }
 
 void LLRenderHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height)
 {
-    // TODO: send back dirty rects?
+#ifdef FLIP_OUTPUT_Y
+	// change flip buffer size only if it changed
+	resizeFlipBuffer(width, height);
 
-    //for (size_t i = 0; i < dirtyRects.size(); ++i)
-    //{
-    //  std::cout << "    >>> rect " << i << ": " << dirtyRects[i].x << " x " << dirtyRects[i].y << " -- " << dirtyRects[i].width << " x" << dirtyRects[i].height << std::endl;
-    //}
-    mParent->pageChanged((unsigned char*)(buffer), width, height);
+	for (int y = 0; y < height; ++y)
+	{
+		memcpy(flipBuffer + y * width * 4, (unsigned char*)buffer + (height - y - 1) * width * 4, width * 4);
+	}
+
+	mParent->onPageChanged(flipBuffer, width, height);
+#elif
+	mParent->onPageChanged((unsigned char*)(buffer), width, height);
+#endif
+}
+
+void LLRenderHandler::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& custom_cursor_info)
+{
+	mParent->onCursorChanged((LLCEFLib::ECursorType)type, (size_t)cursor);
 }

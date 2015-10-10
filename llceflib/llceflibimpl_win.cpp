@@ -29,7 +29,7 @@
 
 bool isKeyDown(WPARAM wparam)
 {
-	return (GetKeyState(wparam) & 0x8000) != 0;
+	return (GetKeyState((int)wparam) & 0x8000) != 0;
 }
 
 int GetCefKeyboardModifiers(WPARAM wparam, LPARAM lparam)
@@ -113,12 +113,12 @@ int GetCefKeyboardModifiers(WPARAM wparam, LPARAM lparam)
 	return modifiers;
 }
 
-void LLCEFLibImpl::nativeKeyboardEvent(uint32_t msg, uint32_t wparam, uint64_t lparam)
+void LLCEFLibImpl::nativeKeyboardEvent(uint32_t msg, size_t wparam, ptrdiff_t lparam)
 {
 	if (mBrowser && mBrowser->GetHost())
 	{
 		CefKeyEvent event;
-		event.windows_key_code = wparam;
+		event.windows_key_code = (int)wparam;
 		event.native_key_code = (int)lparam;
 		event.is_system_key = msg == WM_SYSCHAR || msg == WM_SYSKEYDOWN || msg == WM_SYSKEYUP;
 
@@ -136,10 +136,10 @@ void LLCEFLibImpl::nativeKeyboardEvent(uint32_t msg, uint32_t wparam, uint64_t l
 }
 
 void LLCEFLibImpl::keyboardEvent(
-	EKeyEvent key_event,
+	LLCEFLib::EKeyEvent key_event,
 	uint32_t key_code,
 	const char *utf8_text,
-	EKeyboardModifier modifiers,
+	LLCEFLib::EKeyboardModifier modifiers,
 	uint32_t native_scan_code,
 	uint32_t native_virtual_key,
 	uint32_t native_modifiers)
@@ -152,7 +152,7 @@ void LLCEFLibImpl::keyboardEvent(
 		event.windows_key_code = native_virtual_key;
 		event.unmodified_character = native_virtual_key;
 
-		if (key_event == KE_KEY_DOWN)
+		if (key_event == LLCEFLib::KE_KEY_DOWN)
 		{
 			event.type = KEYEVENT_RAWKEYDOWN;
 			mBrowser->GetHost()->SendKeyEvent(event);
@@ -162,16 +162,10 @@ void LLCEFLibImpl::keyboardEvent(
 			mBrowser->GetHost()->SendKeyEvent(event);
 		}
 		else
-		if (key_event == KE_KEY_UP)
+		if (key_event == LLCEFLib::KE_KEY_UP)
 		{
 			event.type = KEYEVENT_KEYUP;
 			mBrowser->GetHost()->SendKeyEvent(event);
 		}
 	}
 }
-
-void LLCEFLibImpl::keyPress(int code, bool is_down)
-{
-	// not used for Win32 at the moment.
-}
-

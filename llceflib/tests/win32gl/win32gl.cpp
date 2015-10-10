@@ -27,8 +27,12 @@
 #include <string>
 #include <iostream>
 
+#include <functional>
+
 #include <gl/gl.h>
 #include "../../llceflib.h"
+
+using namespace std::placeholders;
 
 int mAppWindowWidth = 1024;
 int mAppWindowHeight = 1024;
@@ -62,7 +66,7 @@ void resize_gl_screen( int width, int height )
     glLoadIdentity();
 }
 
-void pageChangedCallback(unsigned char* pixels, int width, int height)
+void onPageChangedCallback(unsigned char* pixels, int width, int height)
 {
 	glTexSubImage2D(GL_TEXTURE_2D, 0,
 		0, 0,
@@ -72,17 +76,23 @@ void pageChangedCallback(unsigned char* pixels, int width, int height)
 		pixels);
 }
 
+void onRequestExitCallback()
+{
+	PostQuitMessage(0);
+}
+
 /////////////////////////////////////////////////////////////////////////////////
 //
 void init( HWND hWnd )
 {
 	mLLCEFLib = new LLCEFLib();
 
-	mLLCEFLib->setPageChangedCallback(std::bind(pageChangedCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+	mLLCEFLib->setOnPageChangedCallback(std::bind(onPageChangedCallback, _1, _2, _3));
+	mLLCEFLib->setOnRequestExitCallback(std::bind(onRequestExitCallback));
 
-	LLCEFLibSettings settings;
-	settings.inital_width = gTextureWidth;
-	settings.inital_height = gTextureHeight;
+	LLCEFLib::LLCEFLibSettings settings;
+	settings.initial_width = gTextureWidth;
+	settings.initial_height = gTextureHeight;
 	settings.javascript_enabled = true;
 	settings.cookies_enabled = true;
 	settings.user_agent_substring = "Win32GL Test";
@@ -91,9 +101,7 @@ void init( HWND hWnd )
 	bool result = mLLCEFLib->init(settings);
 	if(result)
 	{
-		//mLLCEFLib->navigate("https://callum-linden.s3.amazonaws.com/cookie_test.html");
-		//mLLCEFLib->navigate("https://secondlife.com");
-		mLLCEFLib->navigate("google.com");
+		mLLCEFLib->navigate("https://callum-linden.s3.amazonaws.com/ceftests.html");
 	}
 }
 
@@ -118,16 +126,16 @@ void update()
     glEnable( GL_TEXTURE_2D );
     glColor3f( 1.0f, 1.0f, 1.0f );
     glBegin( GL_QUADS );
-        glTexCoord2f( 1.0f, 0.0f );
+        glTexCoord2f( 1.0f, 1.0f );
         glVertex2d( mAppWindowWidth, 0 );
 
-        glTexCoord2f( 0.0f, 0.0f );
+        glTexCoord2f( 0.0f, 1.0f );
         glVertex2d( 0, 0 );
 
-        glTexCoord2f( 0.0f, 1.0f );
+        glTexCoord2f( 0.0f, 0.0f );
         glVertex2d( 0, mAppWindowHeight );
 
-        glTexCoord2f( 1.0f, 1.0f );
+        glTexCoord2f( 1.0f, 0.0f );
         glVertex2d( mAppWindowWidth, mAppWindowHeight );
     glEnd();
 
@@ -153,7 +161,7 @@ LRESULT CALLBACK window_proc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         {
 			int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
 			int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
-			mLLCEFLib->mouseButton(MB_MOUSE_BUTTON_LEFT, ME_MOUSE_DOWN, x, y);
+			mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_LEFT, LLCEFLib::ME_MOUSE_DOWN, x, y);
 			mLLCEFLib->setFocus(true);
 			return 0;
         };
@@ -162,14 +170,13 @@ LRESULT CALLBACK window_proc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         {
 			int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
 			int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
-			mLLCEFLib->mouseButton(MB_MOUSE_BUTTON_LEFT, ME_MOUSE_UP, x, y);
+			mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_LEFT, LLCEFLib::ME_MOUSE_UP, x, y);
             return 0;
         };
 
 		case WM_RBUTTONUP:
 		{
 			mLLCEFLib->reset();
-			PostMessage(hWnd, WM_CLOSE, 0, 0L);
 			return 0;
 		};
 
@@ -179,12 +186,6 @@ LRESULT CALLBACK window_proc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
 			mLLCEFLib->mouseMove(x, y);
 			return 0;
-        };
-
-        case WM_CLOSE:
-        {
-            PostQuitMessage( 0 );
-            return 0;
         };
 
         case WM_CHAR:
@@ -228,7 +229,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
     wc.cbWndExtra = 0;
     wc.hInstance = hInstance;
     wc.hIcon = LoadIcon( NULL, IDI_WINLOGO );
-    wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+	wc.hCursor = NULL;
     wc.hbrBackground = NULL;
     wc.lpszMenuName = NULL;
     wc.lpszClassName = "Win32GL";
