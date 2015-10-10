@@ -50,6 +50,10 @@ case "$AUTOBUILD_PLATFORM" in
             cmake -G "Ninja" .
             ninja cefclient
         popd
+        pushd "llceflib"
+            cmake -G "Ninja" .
+            ninja llceflib
+        popd
     ;;
     "linux")
         echo "Not implemented"
