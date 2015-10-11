@@ -81,12 +81,8 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 	}
 
 	// list of language locale codes used to configure the Accept-Language HTTP header value
-#ifdef WIN32
 	std::string accept_language_list(user_settings.accept_language_list);
 	cef_string_utf8_to_utf16(accept_language_list.c_str(), accept_language_list.size(), &settings.accept_language_list);
-#elif __APPLE__
-	// feature not supported on revision of OS X CEF we are locked to in 32 bit land
-#endif
 
 	// set path to cache if enabled and set
 	if (user_settings.cache_enabled && user_settings.cache_path.length())
