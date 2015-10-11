@@ -34,7 +34,7 @@
 #include "llcontexthandler.h"
 
 #ifdef __APPLE__
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #endif
 
 LLCEFLibImpl::LLCEFLibImpl() :
@@ -43,10 +43,8 @@ LLCEFLibImpl::LLCEFLibImpl() :
     mBrowser(0)
 {
 	// default is second life scheme
-    std::vector<std::string> default_schemes;
-    default_schemes.push_back("secondlife://"); // bah - clang doesn't like the explicit initialization form
-	mCustomSchemes = default_schemes;
-}
+	mCustomSchemes = {"secondlife", "x-grid-location-info"};
+};
 
 LLCEFLibImpl::~LLCEFLibImpl()
 {
