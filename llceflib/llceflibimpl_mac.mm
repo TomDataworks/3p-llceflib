@@ -135,7 +135,3 @@ void LLCEFLibImpl::keyboardEvent(
     }
 }
 
-void LLCEFLibImpl::nativeKeyboardEvent(uint32_t msg, uint32_t wparam, uint64_t lparam)
-{
-    // not implemented for OS X yet - may only be useful for Windows version
-}
