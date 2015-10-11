@@ -47,11 +47,11 @@ case "$AUTOBUILD_PLATFORM" in
         pushd "cef"
             export GYP_GENERATORS=ninja
             #sh ./cef_create_projects.sh 
-            cmake -G "Ninja" .
+            cmake -G "Ninja" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
             ninja cefclient
         popd
         pushd "llceflib"
-            cmake -G "Ninja" .
+            cmake -G "Ninja" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
             ninja llceflib
         popd
     ;;
