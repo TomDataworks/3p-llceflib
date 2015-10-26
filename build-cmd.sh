@@ -67,7 +67,7 @@ case "$AUTOBUILD_PLATFORM" in
         pushd "cef"
             sed -i -- 's/\/MT/\/MD/' CMakeLists.txt
             sed -i -- 's/\/wd\\\"4244\\\"/\/wd\\\"4244\\\"\ \/wd\\\"4456\\\"\ \/wd\\\"4458\\\"/' CMakeLists.txt
-            mkdir build
+            mkdir -p build
             pushd "build"
                 cmake -G "Visual Studio 14" ..
                 build_sln "cef.sln" "Debug" "Win32" "libcef_dll_wrapper"
@@ -85,7 +85,7 @@ case "$AUTOBUILD_PLATFORM" in
             cp -R Resources/* "$stage/resources"
         popd
         pushd "llceflib"
-            mkdir build
+            mkdir -p build
             pushd "build"
                 cmake -G "Visual Studio 14" ..
                 build_sln "llceflib.sln" "Debug" "Win32"
@@ -104,7 +104,7 @@ case "$AUTOBUILD_PLATFORM" in
         pushd "cef"
             sed -i -- 's/\/MT/\/MD/' CMakeLists.txt
             sed -i -- 's/\/wd\\\"4244\\\"/\/wd\\\"4244\\\"\ \/wd\\\"4456\\\"\ \/wd\\\"4458\\\"/' CMakeLists.txt
-            mkdir build
+            mkdir -p build
             pushd "build"
                 cmake -G "Visual Studio 14 Win64" ..
                 build_sln "cef.sln" "Debug" "x64" "libcef_dll_wrapper"
@@ -122,7 +122,7 @@ case "$AUTOBUILD_PLATFORM" in
             cp -R Resources/* "$stage/resources"
         popd
         pushd "llceflib"
-            mkdir build
+            mkdir -p build
             pushd "build"
                 cmake -G "Visual Studio 14 Win64" ..
                 build_sln "llceflib.sln" "Debug" "x64"
