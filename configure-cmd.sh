@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CEF_NAME="llceflib"
-CEF_VERSION_MAIN="3.2454"
+CEF_VERSION_MAIN="3.2526"
 
 # turn on verbose debugging output for parabuild logs.
 set -x
@@ -29,28 +29,28 @@ pushd "${TOP}"
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
     CEF_PLATFORM="macosx64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1344.g2782fb8"
-    CEF_MD5="1f36440edd3b3330671d1a9d77735a6f"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1363.gabb1158"
+    CEF_MD5="7a1653d450003f8d41247b3ecd150109"
     ;;
     "linux")
     CEF_PLATFORM="linux32"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1329.g29055f6"
-    CEF_MD5="bd2600a175d6c035cef87a96ae7234ad"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1363.gabb1158"
+    CEF_MD5="f66f2484af5e68fd7ef735bec532a9b4"
     ;;
     "linux64")
     CEF_PLATFORM="linux64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1333.ga594fe2"
-    CEF_MD5="7d776de38a86917684058bf1834b8efc"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1363.gabb1158"
+    CEF_MD5="9fb708dbccf9079eda254a2bf2bf5cb0"
     ;;
     "windows")
     CEF_PLATFORM="windows32"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1344.g2782fb8"
-    CEF_MD5="56390a070ad371b604f5d16685e0877e"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1362.g26b3a7a"
+    CEF_MD5="96b5ed5fd95ec95094f2215cd4a0480e"
     ;;
     "windows64")
     CEF_PLATFORM="windows64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1344.g2782fb8"
-    CEF_MD5="1a77ac0cef64d5ea3555f0e1f2aff866"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1362.g26b3a7a"
+    CEF_MD5="28d115ace4c87c75d6e1cf7840516a95"
     ;;
 esac
 CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
