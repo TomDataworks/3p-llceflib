@@ -1,5 +1,6 @@
 /**
  * @brief LLCEFLib - Wrapper for CEF SDK for use in LL Web Media Plugin
+ * @author Callum Prentice 2015
  *
  * $LicenseInfo:firstyear=2001&license=viewerlgpl$
  * Second Life Viewer Source Code
@@ -27,23 +28,16 @@
 #define _LLCEFLIBPLATFORM
 
 //#define LLCEFLIB_DEBUG
-
 #ifdef LLCEFLIB_DEBUG
 #include <iostream>
 #endif
 
+// Latest version of CEF in use on Windows platform has
+// different interfaces from 2171 in use on OS X. This
+// flag is used to switch between the two.
+#define LATEST_CEF_VERSION
+
 // flip the output in the Y direction so it's compatible with SL
 #define FLIP_OUTPUT_Y
-
-#define CEF_BRANCH_2454     (3)
-#define CEF_BRANCH_2378     (2)
-#define CEF_BRANCH_2357		(1)
-#define CEF_BRANCH_2272     (0) /* Base branch, we originally started from this version */
-
-#ifdef WIN32
-#define CEF_CURRENT_BRANCH  CEF_BRANCH_2454
-#elif __APPLE__
-#define CEF_CURRENT_BRANCH  CEF_BRANCH_2454
-#endif
 
 #endif // _LLCEFLIBPLATFORM

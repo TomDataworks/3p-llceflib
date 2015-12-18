@@ -1,5 +1,6 @@
 /**
  * @brief LLCEFLib - Wrapper for CEF SDK for use in LL Web Media Plugin
+ * @author Callum Prentice 2015
  *
  * $LicenseInfo:firstyear=2001&license=viewerlgpl$
  * Second Life Viewer Source Code
@@ -38,26 +39,42 @@ struct LLCEFLibSettings;
 class LLBrowserClient;
 class LLContextHandler;
 
+
+class FlushStoreCallback:
+    public CefCompletionCallback
+{
+    public:
+        void OnComplete() OVERRIDE
+        {
+        }
+
+        IMPLEMENT_REFCOUNTING(FlushStoreCallback);
+};
+
 class LLCEFLibImpl :
     public CefApp
 {
-    public:         // TODO: divide up methods into those uin pImpl interface and not
+    public:
         LLCEFLibImpl();
         virtual ~LLCEFLibImpl();
 
-		bool init(LLCEFLib::LLCEFLibSettings& user_settings);
+        // CefApp overrides
+        virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) OVERRIDE;
+
+        bool init(LLCEFLib::LLCEFLibSettings& user_settings);
         void update();
         void setSize(int width, int height);
         void getSize(int& width, int& height);
         int getDepth();
         void navigate(std::string url);
-		void postData(std::string url, std::string data, std::string headers);
-		bool setCookie(std::string url, std::string name, std::string value, std::string domain, std::string path);
-		void setPageZoom(double zoom_val);
-        void reset();
+        void postData(std::string url, std::string data, std::string headers);
+        void setCookie(std::string url, std::string name, std::string value, std::string domain, std::string path);
+        void setPageZoom(double zoom_val);
+        void requestExit();
+        void shutdown();
 
-        void setOnPageChangedCallback(std::function<void(unsigned char*, int, int)> callback);
-        void onPageChanged(unsigned char*, int, int);
+        void setOnPageChangedCallback(std::function<void(unsigned char*, int, int, int, int, bool)> callback);
+        void onPageChanged(unsigned char*, int, int, int, int, bool);
 
         void setOnCustomSchemeURLCallback(std::function<void(std::string)> callback);
         void onCustomSchemeURL(std::string url);
@@ -65,50 +82,58 @@ class LLCEFLibImpl :
         void setOnConsoleMessageCallback(std::function<void(std::string, std::string, int)> callback);
         void onConsoleMessage(std::string message, std::string source, int line);
 
-		void setOnAddressChangeCallback(std::function<void(std::string)> callback);
-		void onAddressChange(std::string new_url);
+        void setOnAddressChangeCallback(std::function<void(std::string)> callback);
+        void onAddressChange(std::string new_url);
 
-		void setOnStatusMessageCallback(std::function<void(std::string)> callback);
-		void onStatusMessage(std::string value);
+        void setOnStatusMessageCallback(std::function<void(std::string)> callback);
+        void onStatusMessage(std::string value);
 
-		void setOnTitleChangeCallback(std::function<void(std::string)> callback);
+        void setOnTitleChangeCallback(std::function<void(std::string)> callback);
         void onTitleChange(std::string title);
 
-		void OnBeforeClose(CefRefPtr<CefBrowser> browser);
+        void OnBeforeClose(CefRefPtr<CefBrowser> browser);
 
-		void setOnLoadStartCallback(std::function<void()> callback);
-		void onLoadStart();
+        void setOnLoadStartCallback(std::function<void()> callback);
+        void onLoadStart();
 
-		void setOnLoadEndCallback(std::function<void(int)> callback);
-		void onLoadEnd(int httpStatusCode);
+        void setOnLoadEndCallback(std::function<void(int)> callback);
+        void onLoadEnd(int httpStatusCode);
 
-		void setOnNavigateURLCallback(std::function<void(std::string, std::string)> callback);
-		void onNavigateURL(std::string url, std::string target);
+        void setOnNavigateURLCallback(std::function<void(std::string, std::string)> callback);
+        void onNavigateURL(std::string url, std::string target);
 
 		void setOnHTTPAuthCallback(std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> callback);
 		bool onHTTPAuth(const std::string host, const std::string realm, std::string& username, std::string& password);
 
+		void setOnFileDownloadCallback(std::function<void(const std::string filename)> callback);
+		void onFileDownload(const std::string filename);
+
 		void setOnRequestExitCallback(std::function<void()> callback);
-		void onRequestExit();
+        void onRequestExit();
 
-		void setOnCursorChangedCallback(std::function<void(LLCEFLib::ECursorType type, size_t cursor)> callback);
-		void onCursorChanged(LLCEFLib::ECursorType type, size_t cursor);
+        void setOnCursorChangedCallback(std::function<void(LLCEFLib::ECursorType type, unsigned int cursor)> callback);
+        void onCursorChanged(LLCEFLib::ECursorType type, unsigned int cursor);
 
-		void mouseButton(LLCEFLib::EMouseButton mouse_button, LLCEFLib::EMouseEvent mouse_event, int x, int y);
-		void mouseMove(int x, int y);
-		void nativeMouseEvent(uint32_t msg, uint32_t wparam, ptrdiff_t lparam);
+        void mouseButton(LLCEFLib::EMouseButton mouse_button, LLCEFLib::EMouseEvent mouse_event, int x, int y);
+        void mouseMove(int x, int y);
+        void nativeMouseEvent(uint32_t msg, uint32_t wparam, uint64_t lparam);
 
-		void nativeKeyboardEvent(uint32_t msg, size_t wparam, ptrdiff_t lparam);
-		void keyboardEvent(
-			LLCEFLib::EKeyEvent key_event,
-			uint32_t key_code,
-			const char *utf8_text,
-			LLCEFLib::EKeyboardModifier modifiers,
-			uint32_t native_scan_code,
-			uint32_t native_virtual_key,
-			uint32_t native_modifiers);
+        void keyboardEventOSX(uint32_t eventType, uint32_t modifiers, const char* characters, const char* unmodChars, bool repeat, uint32_t keyCode);
 
-        void mouseWheel(int deltaY);
+        void nativeKeyboardEvent(uint32_t msg, uint32_t wparam, uint64_t lparam);
+        void injectUnicodeText(wchar_t unicodeChars, wchar_t unmodChars, uint32_t keyCode, uint32_t modifiers);
+
+        void nativeKeyboardEventOSX(void* nsEvent);
+        void keyboardEvent(
+            LLCEFLib::EKeyEvent key_event,
+            uint32_t key_code,
+            const char* utf8_text,
+            LLCEFLib::EKeyboardModifier modifiers,
+            uint32_t native_scan_code,
+            uint32_t native_virtual_key,
+            uint32_t native_modifiers);
+
+        void mouseWheel(int deltaX, int deltaY);
         void setFocus(bool focus);
 
         void stop();
@@ -119,41 +144,52 @@ class LLCEFLibImpl :
         void goForward();
         bool isLoading();
 
-		bool editCanCopy();
-		bool editCanCut();
-		bool editCanPaste();
-		void editCopy();
-		void editCut();
-		void editPaste();
+        bool editCanCopy();
+        bool editCanCut();
+        bool editCanPaste();
+        void editCopy();
+        void editCut();
+        void editPaste();
 
-		void setCustomSchemes(std::vector<std::string> custom_schemes);
-		std::vector<std::string>& getCustomSchemes();
+        void setCustomSchemes(std::vector<std::string> custom_schemes);
+        std::vector<std::string>& getCustomSchemes();
+
+        void showDevTools(bool show);
 
         /* virtual */
         void OnRegisterCustomSchemes(CefRefPtr<CefSchemeRegistrar> registrar) OVERRIDE;
 
+        CefRefPtr<CefBrowser> getBrowser();
+        void setBrowser(CefRefPtr<CefBrowser> browser);
+
+        std::string makeCompatibleUserAgentString(const std::string base);
+
     private:
         CefRefPtr<LLBrowserClient> mBrowserClient;
         CefRefPtr<CefBrowser> mBrowser;
-		CefRefPtr<LLContextHandler> mContextHandler;
+        CefRefPtr<LLContextHandler> mContextHandler;
         int mViewWidth;
         int mViewHeight;
         const int mViewDepth = 4;
-		std::vector<std::string> mCustomSchemes;
-        std::function<void(unsigned char*, int, int)> mOnPageChangedCallbackFunc;
+        bool mSystemFlashEnabled;
+        std::vector<std::string> mCustomSchemes;
+        std::function<void(unsigned char*, int, int, int, int, bool)> mOnPageChangedCallbackFunc;
         std::function<void(std::string)> mOnCustomSchemeURLCallbackFunc;
         std::function<void(std::string, std::string, int line)> mOnConsoleMessageCallbackFunc;
-		std::function<void(std::string)> mOnAddressChangeCallbackFunc;
-		std::function<void(std::string)> mOnStatusMessageCallbackFunc;
-		std::function<void(std::string)> mOnTitleChangeCallbackFunc;
-		std::function<void()> mOnLoadStartCallbackFunc;
-		std::function<void(int)> mOnLoadEndCallbackFunc;
-		std::function<void(std::string, std::string)> mOnNavigateURLCallbackFunc;
+        std::function<void(std::string)> mOnAddressChangeCallbackFunc;
+        std::function<void(std::string)> mOnStatusMessageCallbackFunc;
+        std::function<void(std::string)> mOnTitleChangeCallbackFunc;
+        std::function<void()> mOnLoadStartCallbackFunc;
+        std::function<void(int)> mOnLoadEndCallbackFunc;
+        std::function<void(std::string, std::string)> mOnNavigateURLCallbackFunc;
 		std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> mOnHTTPAuthCallbackFunc;
-		std::function<void()> mOnRequestExitCallbackFunc;
-		std::function<void(LLCEFLib::ECursorType type, size_t cursor)> mOnCursorChangedCallbackFunc;
+		std::function<void(const std::string filename)> mOnFileDownloadCallbackFunc;
+        std::function<void()> mOnRequestExitCallbackFunc;
+        std::function<void(LLCEFLib::ECursorType type, unsigned int cursor)> mOnCursorChangedCallbackFunc;
 
-		IMPLEMENT_REFCOUNTING(LLCEFLibImpl);
+        CefRefPtr<FlushStoreCallback> mFlushStoreCallback;
+
+        IMPLEMENT_REFCOUNTING(LLCEFLibImpl);
 };
 
 #endif // _LLCEFLIBIMPL

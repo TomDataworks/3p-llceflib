@@ -24,10 +24,14 @@
  */
 
 #include "llceflibimpl.h"
-#include "llceflib.h"
+#include "llCEFLib.h"
 
 #include "llceflibplatform.h"
 #include "llschemehandler.h"
+
+#import <Cocoa/Cocoa.h>
+
+#include <locale>
 
 // See: const KeyCodeMap kKeyCodesMap[] in
 // http://src.chromium.org/viewvc/chrome/trunk/src/ui/events/keycodes/keyboard_code_conversion_mac.mm
@@ -43,6 +47,31 @@
 
 namespace LLCEFLibImplMacAssist
 {
+    uint32_t modifiersForModifierFlags(uint32_t modifierFlags)
+    {
+        uint32_t modifers = EVENTFLAG_NONE;
+
+        if (modifierFlags & NSAlphaShiftKeyMask)
+            modifers |= EVENTFLAG_CAPS_LOCK_ON;
+
+        if (modifierFlags & NSShiftKeyMask)
+            modifers |= EVENTFLAG_SHIFT_DOWN;
+
+        if (modifierFlags & NSControlKeyMask)
+            modifers |= EVENTFLAG_CONTROL_DOWN;
+
+        if (modifierFlags & NSAlternateKeyMask)
+            modifers |= EVENTFLAG_ALT_DOWN;
+
+        if (modifierFlags & NSCommandKeyMask)
+            modifers |= EVENTFLAG_COMMAND_DOWN;
+
+        if (modifierFlags & NSNumericPadKeyMask)
+            modifers |= EVENTFLAG_IS_KEY_PAD;
+
+        return modifers;
+    }
+
     int asciiToNativeKey(int code)
     {
         switch(code)
@@ -93,6 +122,13 @@ void LLCEFLibImpl::keyboardEvent(
     {
         if (mBrowser->GetHost())
         {
+            uint32_t translatedModifiers = modifiers;
+
+            if (native_modifiers)
+            {   // native modifiers will override the modifiers variable.
+                translatedModifiers = LLCEFLibImplMacAssist::modifiersForModifierFlags(native_modifiers);
+            }
+
             key_code = LLCEFLibImplMacAssist::slToASCIIKey(key_code);
 
             if(LLCEFLibImplMacAssist::isSpecialKey(key_code))
@@ -104,7 +140,7 @@ void LLCEFLibImpl::keyboardEvent(
                     event.character = 0;
                     event.unmodified_character = 0;
                     event.native_key_code = native_key_code;
-                    event.modifiers = 0;
+                    event.modifiers = translatedModifiers;
                     event.type = KEYEVENT_KEYDOWN;
 
                     mBrowser->GetHost()->SendKeyEvent(event);
@@ -115,7 +151,7 @@ void LLCEFLibImpl::keyboardEvent(
 
             CefKeyEvent event;
             event.is_system_key = false;
-            event.modifiers = 0;
+            event.modifiers = translatedModifiers;
             event.character = key_code;
 
             if(key_event == LLCEFLib::KE_KEY_DOWN)
@@ -135,3 +171,93 @@ void LLCEFLibImpl::keyboardEvent(
     }
 }
 
+void LLCEFLibImpl::nativeKeyboardEvent(uint32_t msg, uint32_t wparam, uint64_t lparam)
+{
+    // not implemented for OS X yet - may only be useful for Windows version
+}
+
+void LLCEFLibImpl::keyboardEventOSX(uint32_t eventType, uint32_t modifiers, const char *characters, const char *unmodChars, bool repeat, uint32_t keyCode)
+{
+    NSString *strChars = (characters) ? [ NSString stringWithFormat: @"%c", *characters] : @"";
+    NSString *strUnmod = (unmodChars) ? [ NSString stringWithFormat: @"%c", *unmodChars] : @"";
+
+    NSEvent *anEvent = [NSEvent keyEventWithType: eventType
+                                        location: NSMakePoint(0.0f, 0.0f)
+                                   modifierFlags: modifiers
+                                       timestamp: 0
+                                    windowNumber: 0
+                                         context: NULL
+                                      characters: strChars
+                     charactersIgnoringModifiers: strUnmod
+                                       isARepeat: repeat
+                                         keyCode: keyCode];
+
+    nativeKeyboardEventOSX( anEvent );
+}
+
+void LLCEFLibImpl::nativeKeyboardEventOSX(void *nsEvent)
+{
+    if (mBrowser)
+    {
+        if (mBrowser->GetHost())
+        {
+            static uint32_t lastModifiers = LLCEFLibImplMacAssist::modifiersForModifierFlags([NSEvent modifierFlags]);
+            static uint32_t newModifiers = LLCEFLibImplMacAssist::modifiersForModifierFlags([NSEvent modifierFlags]);
+
+            NSEvent *theEvent = (NSEvent *)nsEvent;
+
+            lastModifiers = newModifiers;
+            newModifiers = LLCEFLibImplMacAssist::modifiersForModifierFlags([theEvent modifierFlags]);
+
+            if ([theEvent type] == NSFlagsChanged)
+            {
+                // Do nothing.
+            }
+            else if (([theEvent type] == NSKeyDown) || ([theEvent type] == NSKeyUp))
+            {
+                NSString *c = [theEvent characters];
+                NSString *cim = [theEvent charactersIgnoringModifiers];
+
+                CefKeyEvent keyEvent;
+                if ([theEvent type] == NSKeyDown)
+                    keyEvent.type = KEYEVENT_KEYDOWN;
+                else
+                    keyEvent.type = KEYEVENT_KEYUP;
+                if ([c length] > 0)
+                {
+                    keyEvent.character = [c characterAtIndex:0];
+                }
+                if ([cim length] > 0)
+                {
+                    keyEvent.unmodified_character = [cim characterAtIndex:0];
+                }
+                keyEvent.native_key_code = [theEvent keyCode];
+                keyEvent.modifiers = newModifiers;
+
+                mBrowser->GetHost()->SendKeyEvent(keyEvent);
+
+                if ((keyEvent.character == 13) && (keyEvent.type  == KEYEVENT_KEYDOWN))
+                {   // for CR only: The viewer will swallow the event long before it is passed
+                    // to the plugin.  So we create a fake keypress for Return.
+                    keyEvent.type = KEYEVENT_CHAR;
+                    mBrowser->GetHost()->SendKeyEvent(keyEvent);
+                }
+            }
+        }
+    }
+}
+
+void LLCEFLibImpl::injectUnicodeText(wchar_t unicodeChars, wchar_t unmodChars,
+        uint32_t keyCode, uint32_t modifiers)
+{
+    CefKeyEvent keyEvent;
+
+    keyEvent.type = KEYEVENT_CHAR;
+    keyEvent.character = unicodeChars;
+    keyEvent.unmodified_character = unmodChars;
+    keyEvent.native_key_code = keyCode;
+    keyEvent.modifiers = LLCEFLibImplMacAssist::modifiersForModifierFlags( modifiers );
+    
+    mBrowser->GetHost()->SendKeyEvent(keyEvent);
+    
+}

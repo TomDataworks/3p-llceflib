@@ -1,5 +1,6 @@
 /**
  * @brief LLCEFLib - Wrapper for CEF SDK for use in LL Web Media Plugin
+ * @author Callum Prentice 2015
  *
  * $LicenseInfo:firstyear=2001&license=viewerlgpl$
  * Second Life Viewer Source Code
@@ -31,67 +32,103 @@ LLRenderHandler::LLRenderHandler(LLCEFLibImpl* parent) :
     mParent(parent)
 {
 #ifdef FLIP_OUTPUT_Y
-	flipBufferWidth = 0;
-	flipBufferHeight = 0;
-	flipBufferDepth = parent->getDepth();
-	flipBuffer = 0;
+    flipBufferWidth = 0;
+    flipBufferHeight = 0;
+    flipBufferDepth = parent->getDepth();
+    flipBuffer = 0;
 #endif
 }
 
 LLRenderHandler::~LLRenderHandler()
 {
 #ifdef FLIP_OUTPUT_Y
-	delete[]  flipBuffer;
+    delete[]  flipBuffer;
 #endif
 }
 
 void LLRenderHandler::resizeFlipBuffer(int width, int height)
 {
 #ifdef FLIP_OUTPUT_Y
-	if (flipBufferWidth != width || flipBufferHeight != height)
-	{
-		delete[]  flipBuffer;
-		flipBufferWidth = width;
-		flipBufferHeight = height;
-		flipBuffer = new unsigned char[flipBufferWidth * flipBufferHeight * flipBufferDepth];
-		memset(flipBuffer, 0, flipBufferWidth * flipBufferHeight * flipBufferDepth);
-	}
+    if (flipBufferWidth != width || flipBufferHeight != height)
+    {
+        delete[]  flipBuffer;
+        flipBufferWidth = width;
+        flipBufferHeight = height;
+        flipBuffer = new unsigned char[flipBufferWidth * flipBufferHeight * flipBufferDepth];
+        memset(flipBuffer, 0, flipBufferWidth * flipBufferHeight * flipBufferDepth);
+    }
 #endif
 }
 
-bool LLRenderHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
+bool LLRenderHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 {
     int width, height;
     mParent->getSize(width, height);
 
 #ifdef FLIP_OUTPUT_Y
-	// change flip buffer size only if it changed
-	resizeFlipBuffer(width, height);
+    // change flip buffer size only if it changed
+    resizeFlipBuffer(width, height);
 #endif
 
     rect = CefRect(0, 0, width, height);
 
-	return true;
+    return true;
 }
 
-void LLRenderHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height)
+void LLRenderHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList& dirtyRects, const void* buffer, int width, int height)
 {
+    int x = 0;
+    int y = 0;
+    bool is_popup = type == PET_POPUP ? true : false;
+
+    if (type == PET_POPUP)
+    {
+        x = mPopupRect.x;
+        y = mPopupRect.y;
+    }
+
 #ifdef FLIP_OUTPUT_Y
-	// change flip buffer size only if it changed
-	resizeFlipBuffer(width, height);
 
-	for (int y = 0; y < height; ++y)
-	{
-		memcpy(flipBuffer + y * width * 4, (unsigned char*)buffer + (height - y - 1) * width * 4, width * 4);
-	}
+    // change flip buffer size only if it changed
+    resizeFlipBuffer(width, height);
 
-	mParent->onPageChanged(flipBuffer, width, height);
+    for (int y = 0; y < height; ++y)
+    {
+        memcpy(flipBuffer + y * width * 4, (unsigned char*)buffer + (height - y - 1) * width * 4, width * 4);
+    }
+
+    mParent->onPageChanged(flipBuffer, x, y, width, height, is_popup);
 #elif
-	mParent->onPageChanged((unsigned char*)(buffer), width, height);
+    mParent->onPageChanged((unsigned char*)(buffer), x, y, width, height, is_popup);
 #endif
 }
 
 void LLRenderHandler::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& custom_cursor_info)
 {
-	mParent->onCursorChanged((LLCEFLib::ECursorType)type, (size_t)cursor);
+    mParent->onCursorChanged((LLCEFLib::ECursorType)type, (unsigned int)cursor);
+}
+
+void LLRenderHandler::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
+{
+    if (!show)
+    {
+        mPopupRect.Set(0, 0, 0, 0);
+
+        mParent->getBrowser()->GetHost()->Invalidate(PET_VIEW);
+    }
+}
+
+void LLRenderHandler::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
+{
+    setPopupLocation(rect);
+}
+
+void LLRenderHandler::setPopupLocation(const CefRect& rect)
+{
+    mPopupRect = rect;
+}
+
+const CefRect& LLRenderHandler::getPopupLocation()
+{
+    return mPopupRect;
 }

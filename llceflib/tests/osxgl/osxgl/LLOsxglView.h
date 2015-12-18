@@ -1,6 +1,5 @@
 /**
  * @brief LLCEFLib - Wrapper for CEF SDK for use in LL Web Media Plugin
- * @author Callum Prentice 2015
  *
  * $LicenseInfo:firstyear=2001&license=viewerlgpl$
  * Second Life Viewer Source Code
@@ -24,29 +23,27 @@
  * $/LicenseInfo$
  */
 
-#ifndef _LLSCHEMEHANDLER
-#define _LLSCHEMEHANDLER
-#pragma once
+#import <Cocoa/Cocoa.h>
 
-#include <vector>
-#include "include/cef_base.h"
+class LLCEFLib;
 
-#include "llceflibplatform.h"
-
-class CefBrowser;
-class CefSchemeRegistrar;
-
-class LLCEFLibImpl;
-
-namespace scheme_handler
+@interface LLOsxglView : NSView <NSWindowDelegate>
 {
+    NSOpenGLContext* _openGLContext;
+    LLCEFLib* _llCefLib;
+    NSTimer* _timer;
+    BOOL _isClosing;
+    BOOL _needsShutdown;
+}
 
-// Register the scheme.
-void RegisterCustomSchemes(CefRefPtr<CefSchemeRegistrar> registrar);
+@property(retain) NSOpenGLContext* openGLContext;
+@property(assign) LLCEFLib* llCefLib;
+@property(retain) NSTimer* timer;
+@property(assign) BOOL isClosing;
+@property(assign) BOOL needsShutdown;
 
-// Create the scheme handler.
-void RegisterSchemeHandlers(LLCEFLibImpl* parent);
++ (LLOsxglView*)current;
 
-} // scheme_handler
+- (void)onPageChangedCallbackPixels:(unsigned char*)pixels x:(int)x y:(int)y width:(int)width height:(int)height is_popup:(bool)is_popup;
 
-#endif  // _LLSCHEMEHANDLER
+@end

@@ -1,5 +1,6 @@
 /**
  * @brief LLCEFLib - Wrapper for CEF SDK for use in LL Web Media Plugin
+ * @author Callum Prentice 2015
  *
  * $LicenseInfo:firstyear=2001&license=viewerlgpl$
  * Second Life Viewer Source Code
@@ -34,33 +35,48 @@
 
 class LLContextHandler: public CefRequestContextHandler
 {
-public:
-   LLContextHandler(std::string cookieStorageDirectory)
-   {
-#ifdef LLCEFLIB_DEBUG
-       std::cout << "Cookie storage directory: " << cookieStorageDirectory << std::endl;
+    public:
+        LLContextHandler(std::string cookieStorageDirectory)
+        {
+#ifdef LATEST_CEF_VERSION
+            mCookieManager = CefCookieManager::CreateManager(CefString(cookieStorageDirectory), false, nullptr);
+#else
+            mCookieManager = CefCookieManager::CreateManager(CefString(cookieStorageDirectory), false);
 #endif
-    
-       // CEF changed interfaces between these two branches
-#if CEF_CURRENT_BRANCH >= CEF_BRANCH_2357
-       _cookieManager = CefCookieManager::CreateManager(CefString(cookieStorageDirectory), false, nullptr);
-#else // CEF_BRANCH_2272
-       _cookieManager = CefCookieManager::CreateManager(CefString(cookieStorageDirectory), false);
-#endif
-   };
+        };
 
-   virtual ~LLContextHandler(){};
-   
-   CefRefPtr<CefCookieManager> GetCookieManager() OVERRIDE
-   {
-      return _cookieManager; 
-   }
-   
-private:
-   CefRefPtr<CefCookieManager> _cookieManager;
-   
-   // Include the default reference counting implementation.
-   IMPLEMENT_REFCOUNTING(LLContextHandler);
+        virtual ~LLContextHandler()
+        {
+        };
+
+        CefRefPtr<CefCookieManager> GetCookieManager() OVERRIDE
+        {
+            return mCookieManager;
+        }
+
+#ifdef LATEST_CEF_VERSION
+        bool OnBeforePluginLoad(const CefString& mime_type,
+                                const CefString& plugin_url,
+                                const CefString& top_origin_url,
+                                CefRefPtr<CefWebPluginInfo> plugin_info,
+                                PluginPolicy* plugin_policy)
+        {
+            if (*plugin_policy != PLUGIN_POLICY_ALLOW &&
+                    mime_type == "application/pdf")
+            {
+                *plugin_policy = PLUGIN_POLICY_ALLOW;
+                return true;
+
+            }
+
+            return false;
+        }
+#endif
+
+    private:
+        CefRefPtr<CefCookieManager> mCookieManager;
+
+        IMPLEMENT_REFCOUNTING(LLContextHandler);
 };
 
-#endif  // _LLContextHandler
+#endif  // _LLCONTEXTHANDLER_H

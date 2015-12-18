@@ -39,6 +39,7 @@ set(llceflib_HEADER_FILES
 llbrowserclient.h
 llceflib.h
 llceflibimpl.h
+llceflibplatform.h
 llrenderhandler.h
 llschemehandler.h
 )

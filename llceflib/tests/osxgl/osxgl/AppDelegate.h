@@ -1,6 +1,5 @@
 /**
  * @brief LLCEFLib - Wrapper for CEF SDK for use in LL Web Media Plugin
- * @author Callum Prentice 2015
  *
  * $LicenseInfo:firstyear=2001&license=viewerlgpl$
  * Second Life Viewer Source Code
@@ -24,29 +23,13 @@
  * $/LicenseInfo$
  */
 
-#ifndef _LLSCHEMEHANDLER
-#define _LLSCHEMEHANDLER
-#pragma once
+#import <Cocoa/Cocoa.h>
 
-#include <vector>
-#include "include/cef_base.h"
-
-#include "llceflibplatform.h"
-
-class CefBrowser;
-class CefSchemeRegistrar;
-
-class LLCEFLibImpl;
-
-namespace scheme_handler
+@interface AppDelegate : NSObject <NSApplicationDelegate>
 {
+    NSWindow* _window;
+}
 
-// Register the scheme.
-void RegisterCustomSchemes(CefRefPtr<CefSchemeRegistrar> registrar);
+@property(weak) IBOutlet NSWindow* window;
 
-// Create the scheme handler.
-void RegisterSchemeHandlers(LLCEFLibImpl* parent);
-
-} // scheme_handler
-
-#endif  // _LLSCHEMEHANDLER
+@end
