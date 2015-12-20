@@ -49,10 +49,17 @@ case "$AUTOBUILD_PLATFORM" in
             #sh ./cef_create_projects.sh 
             cmake -G "Ninja" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
             ninja cefclient
+
+            cp -R cefclient/resources/* "${stage}/resources"
+            cp -R "cefclient/cefclient.app" "${stage_bin_release}"
+            cp -R "cefclient/cefclient Helper.app" "${stage_bin_release}"
+
         popd
         pushd "llceflib"
             cmake -G "Ninja" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
             ninja llceflib
+
+            cp "lib/libllceflib.a" "${stage_lib_release}"
         popd
     ;;
     "linux")
