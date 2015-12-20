@@ -83,7 +83,6 @@ class LLBrowserClient :
         CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE{ return this; }
         void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame) OVERRIDE;
         void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) OVERRIDE;
-        void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) OVERRIDE;
 
         // CefRequestHandler overrides
         CefRefPtr<CefRequestHandler> GetRequestHandler() OVERRIDE{ return this; }
