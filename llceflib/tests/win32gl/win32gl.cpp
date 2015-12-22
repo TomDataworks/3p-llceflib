@@ -222,8 +222,19 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             return 0;
         };
 
+        case WM_RBUTTONDOWN:
+        {
+            int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
+            int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
+            mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_RIGHT, LLCEFLib::ME_MOUSE_DOWN, x, y);
+            return 0;
+        }
+
         case WM_RBUTTONUP:
         {
+            int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
+            int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
+            mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_RIGHT, LLCEFLib::ME_MOUSE_UP, x, y);
             return 0;
         };
 
