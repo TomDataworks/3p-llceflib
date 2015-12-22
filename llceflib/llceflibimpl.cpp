@@ -65,6 +65,7 @@ void LLCEFLibImpl::OnBeforeCommandLineProcessing(const CefString& process_type, 
     {
         command_line->AppendSwitch("disable-surfaces");     // for PDF files
         command_line->AppendSwitch("enable-media-stream");  // for webcam/media access
+        command_line->AppendSwitch("enable-begin-frame-scheduling"); // Synchronize the frame rate between all processes.
         if (mSystemFlashEnabled == true)                    // for Flash
         {
             command_line->AppendSwitch("enable-system-flash");
