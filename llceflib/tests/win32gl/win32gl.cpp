@@ -49,6 +49,7 @@ LLCEFLib* mLLCEFLib;
 unsigned char pixels[gTextureWidth * gTextureHeight * gTextureDepth];
 GLuint texture_handle = 0;
 const std::string gHomePage("https://callum-linden.s3.amazonaws.com/ceftests.html");
+const std::string gCefAbout("chrome://about");
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -191,6 +192,10 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
                 case ID_TESTS_OPENDEVELOPERCONSOLE:
                     mLLCEFLib->showDevTools(true);
+                    break;
+
+                case ID_TESTS_ABOUTCEF:
+                    mLLCEFLib->navigate(gCefAbout);
                     break;
 
                 default:
