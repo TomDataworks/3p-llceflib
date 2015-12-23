@@ -66,7 +66,7 @@ void LLCEFLibImpl::OnBeforeCommandLineProcessing(const CefString& process_type, 
         command_line->AppendSwitch("disable-surfaces");     // for PDF files
         command_line->AppendSwitch("enable-media-stream");  // for webcam/media access
         command_line->AppendSwitch("enable-begin-frame-scheduling"); // Synchronize the frame rate between all processes.
-        if (mSystemFlashEnabled == true)                    // for Flash
+        if (mSystemFlashEnabled)                    // for Flash
         {
             command_line->AppendSwitch("enable-system-flash");
         }
@@ -115,6 +115,8 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
     {
         CefString(&settings.cache_path) = user_settings.cache_path;
     }
+
+    settings.log_severity = user_settings.debug_output ? LOGSEVERITY_DEFAULT : LOGSEVERITY_DISABLE;
 
     mSystemFlashEnabled = user_settings.plugins_enabled;
 

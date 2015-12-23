@@ -73,6 +73,7 @@ class LLCEFLib
             bool plugins_enabled = true;
             bool cookies_enabled = true;
             bool cache_enabled = true;
+            bool debug_output = false;
 
             // path to browser cache
             std::string cache_path = "";
