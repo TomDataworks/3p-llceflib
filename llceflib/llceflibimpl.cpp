@@ -113,10 +113,16 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
     // set path to cache if enabled and set
     if (user_settings.cache_enabled && user_settings.cache_path.length())
     {
-        CefString(&settings.cache_path) = user_settings.cache_path;
+        std::string cache_path(user_settings.cache_path);
+        cef_string_utf8_to_utf16(cache_path.c_str(), cache_path.size(), &settings.cache_path);
     }
 
     settings.log_severity = user_settings.debug_output ? LOGSEVERITY_DEFAULT : LOGSEVERITY_DISABLE;
+    if (user_settings.debug_output)
+    {
+        std::string log_file(user_settings.log_file);
+        cef_string_utf8_to_utf16(log_file.c_str(), log_file.size(), &settings.log_file);
+    }
 
     mSystemFlashEnabled = user_settings.plugins_enabled;
 
