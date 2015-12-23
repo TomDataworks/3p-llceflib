@@ -103,12 +103,12 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
     }
 
     // list of language locale codes used to configure the Accept-Language HTTP header value
-#ifdef LATEST_CEF_VERSION
     std::string accept_language_list(user_settings.accept_language_list);
     cef_string_utf8_to_utf16(accept_language_list.c_str(), accept_language_list.size(), &settings.accept_language_list);
-#else
-    // feature not supported on revision of OS X CEF we are locked to in 32 bit land
-#endif
+
+    // Set the proper locale for cef internals
+    std::string locale(user_settings.locale);
+    cef_string_utf8_to_utf16(locale.c_str(), locale.size(), &settings.locale);
 
     // set path to cache if enabled and set
     if (user_settings.cache_enabled && user_settings.cache_path.length())
@@ -117,6 +117,7 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
         cef_string_utf8_to_utf16(cache_path.c_str(), cache_path.size(), &settings.cache_path);
     }
 
+    // Control logging output and location
     settings.log_severity = user_settings.debug_output ? LOGSEVERITY_DEFAULT : LOGSEVERITY_DISABLE;
     if (user_settings.debug_output)
     {

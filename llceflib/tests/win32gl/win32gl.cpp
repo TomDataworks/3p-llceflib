@@ -118,7 +118,8 @@ void init(HWND hWnd)
     settings.plugins_enabled = true;
     settings.cookie_store_path = "c:\\win32gl-cef-cookies";
     settings.user_agent_substring = mLLCEFLib->makeCompatibleUserAgentString("Win32GL");
-    settings.accept_language_list = "en-us";
+    settings.accept_language_list = "en-US";
+    settings.locale = "en-US";
     settings.debug_output = false;
 
     bool result = mLLCEFLib->init(settings);
