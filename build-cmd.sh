@@ -51,8 +51,8 @@ case "$AUTOBUILD_PLATFORM" in
             ninja cefclient
 
             cp -R cefclient/resources/* "${stage}/resources"
-            cp "cef/libcef_dll_wrapper.a" "${stage_lib_release}"
-            cp -R "cef/Release/Chromium Embedded Framework.framework" "${stage_lib_release}"
+            cp libcef_dll/libcef_dll_wrapper.a "${stage_lib_release}"
+            cp -R Release/"Chromium Embedded Framework.framework" "${stage_lib_release}"
             cp -R "cefclient/cefclient.app" "${stage_bin_release}"
             cp -R "cefclient/cefclient Helper.app" "${stage_bin_release}"
 
