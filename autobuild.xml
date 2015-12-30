@@ -71,7 +71,6 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>bin/release/*</string>
             <string>lib/release/*</string>
           </array>
           <key>name</key>

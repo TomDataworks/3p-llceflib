@@ -45,23 +45,23 @@ mkdir -p "$stage/resources"
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
         pushd "cef"
-            export GYP_GENERATORS=ninja
+            export GYP_GENERATORS=xcode GYP_DEFINES=mac_sdk=10.11
             #sh ./cef_create_projects.sh 
-            cmake -G "Ninja" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
-            ninja cefclient
+            cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
+            xcodebuild -target libcef_dll_wrapper -sdk macosx10.11 -configuration Release
+
 
             cp -R cefclient/resources/* "${stage}/resources"
-            cp libcef_dll/libcef_dll_wrapper.a "${stage_lib_release}"
+            cp libcef_dll/Release/libcef_dll_wrapper.a "${stage_lib_release}"
             cp -R Release/"Chromium Embedded Framework.framework" "${stage_lib_release}"
-            cp -R "cefclient/cefclient.app" "${stage_bin_release}"
-            cp -R "cefclient/cefclient Helper.app" "${stage_bin_release}"
-
         popd
         pushd "llceflib"
-            cmake -G "Ninja" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
-            ninja llceflib
+            cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
+            xcodebuild -target llceflib -sdk macosx10.11 -configuration Release
+            xcodebuild -target llceflib_host -sdk macosx10.11 -configuration Release
 
-            cp "lib/libllceflib.a" "${stage_lib_release}"
+            cp "lib/Release/libllceflib.a" "${stage_lib_release}"
+            cp -R "bin/Release/llceflib_host.app" "${stage_lib_release}"
         popd
     ;;
     "linux")

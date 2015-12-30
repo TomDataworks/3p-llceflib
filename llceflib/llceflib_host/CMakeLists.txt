@@ -1,13 +1,26 @@
 set(llceflib_host_SOURCE_FILES llceflib_host.cpp)
-
-add_executable(llceflib_host WIN32 ${llceflib_host_SOURCE_FILES} )
-
-target_link_libraries(llceflib_host ${CEF_LIBS})
-
+add_executable(llceflib_host WIN32 MACOSX_BUNDLE ${llceflib_host_SOURCE_FILES} )
 add_dependencies(llceflib_host llceflib)
 
 if (MSVC)
+  target_link_libraries(llceflib_host ${CEF_LIBS})
   set_target_properties(llceflib PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-
   EMBED_MANIFEST(llceflib_host 1)
-endif (MSVC)
+elseif (APPLE)
+  include(BundleUtilities)
+
+  set(LIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../stage/lib/release)
+  find_library(CEF_FRAMEWORK "Chromium Embedded Framework"
+      PATHS ${LIB_PATH} REQUIRED)
+  find_library(LIBCEF_LIBRARY cef_dll_wrapper
+      PATHS ${LIB_PATH} REQUIRED)
+  mark_as_advanced(CEF_FRAMEWORK LIBCEF_LIBRARY)
+
+  target_link_libraries(llceflib_host ${CEF_LIBS} ${CEF_FRAMEWORK} ${LIBCEF_LIBRARY})
+  set_target_properties(llceflib_host PROPERTIES 
+      MACOSX_BUNDLE_BUNDLE_NAME "LibCefLib Helper"
+      MACOSX_BUNDLE_GUI_IDENTIFIER "com.llceflib.helper"
+      MACOSX_BUNDLE_COPYRIGHT "2015 Alchemy Development Group")
+  #VERIFY_APP(llceflib_host)
+endif ()
+
