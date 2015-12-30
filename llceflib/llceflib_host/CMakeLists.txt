@@ -19,8 +19,15 @@ elseif (APPLE)
   target_link_libraries(llceflib_host ${CEF_LIBS} ${CEF_FRAMEWORK} ${LIBCEF_LIBRARY})
   set_target_properties(llceflib_host PROPERTIES 
       OUTPUT_NAME "LLCefLib Helper"
-      MACOSX_BUNDLE_GUI_IDENTIFIER "com.llceflib.helper"
-      MACOSX_BUNDLE_COPYRIGHT "2015 Alchemy Development Group")
-  #VERIFY_APP(llceflib_host)
+      MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in")
+
+  # This command kinda sucks, but well... I'm entirely sick of this.
+  add_custom_command(TARGET llceflib_host
+    POST_BUILD
+    COMMAND install_name_tool -change "@executable_path/Chromium Embedded Framework"
+            "@executable_path/../../../../Frameworks/Chromium Embedded Framework.framework/Chromium Embedded Framework"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../bin/Release/LLCefLib Helper.app/Contents/MacOS/LLCefLib Helper"
+    VERBATIM
+    )
 endif ()
 

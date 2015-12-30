@@ -45,10 +45,11 @@ mkdir -p "$stage/resources"
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
         pushd "cef"
-            export GYP_GENERATORS=xcode GYP_DEFINES=mac_sdk=10.11
+            export GYP_GENERATORS=xcode GYP_DEFINES=mac_sdk=10.8
             #sh ./cef_create_projects.sh 
             cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
-            xcodebuild -target libcef_dll_wrapper -sdk macosx10.11 -configuration Release
+            xcodebuild -target libcef_dll_wrapper \
+                -sdk macosx10.11 -mmacosx-version-min=10.8 -configuration Release
 
 
             cp -R cefclient/resources/* "${stage}/resources"
@@ -57,8 +58,10 @@ case "$AUTOBUILD_PLATFORM" in
         popd
         pushd "llceflib"
             cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
-            xcodebuild -target llceflib -sdk macosx10.11 -configuration Release
-            xcodebuild -target llceflib_host -sdk macosx10.11 -configuration Release
+            xcodebuild -target llceflib -sdk macosx10.11 \
+                -mmacosx-version-min=10.8 -configuration Release
+            xcodebuild -target llceflib_host -sdk macosx10.11 \
+                -mmacosx-version-min=10.8 -configuration Release
 
             cp "lib/Release/libllceflib.a" "${stage_lib_release}"
             cp -R "bin/Release/LLCefLib Helper.app" "${stage_lib_release}"
