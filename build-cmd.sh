@@ -61,7 +61,7 @@ case "$AUTOBUILD_PLATFORM" in
             xcodebuild -target llceflib_host -sdk macosx10.11 -configuration Release
 
             cp "lib/Release/libllceflib.a" "${stage_lib_release}"
-            cp -R "bin/Release/LibCefLib Helper.app" "${stage_lib_release}"
+            cp -R "bin/Release/LLCefLib Helper.app" "${stage_lib_release}"
         popd
     ;;
     "linux")
