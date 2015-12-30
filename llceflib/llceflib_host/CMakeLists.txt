@@ -18,7 +18,7 @@ elseif (APPLE)
 
   target_link_libraries(llceflib_host ${CEF_LIBS} ${CEF_FRAMEWORK} ${LIBCEF_LIBRARY})
   set_target_properties(llceflib_host PROPERTIES 
-      MACOSX_BUNDLE_BUNDLE_NAME "LibCefLib Helper"
+      OUTPUT_NAME "LibCefLib Helper"
       MACOSX_BUNDLE_GUI_IDENTIFIER "com.llceflib.helper"
       MACOSX_BUNDLE_COPYRIGHT "2015 Alchemy Development Group")
   #VERIFY_APP(llceflib_host)
