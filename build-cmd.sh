@@ -88,11 +88,13 @@ case "$AUTOBUILD_PLATFORM" in
                 cp libcef_dll/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
                 cp libcef_dll/Release/libcef_dll_wrapper.* "$stage_lib_release"
             popd
-            cp Debug/*.dll "$stage_bin_debug"
             cp Debug/*.bin "$stage_bin_debug"
+            cp Debug/*.dll "$stage_bin_debug"
+            cp Debug/*.exe "$stage_bin_debug"
             cp Debug/libcef.lib "$stage_lib_debug"
-            cp Release/*.dll "$stage_bin_release"
             cp Release/*.bin "$stage_bin_release"
+            cp Release/*.dll "$stage_bin_release"
+            cp Release/*.exe "$stage_bin_release"
             cp Release/libcef.lib "$stage_lib_release"
             cp -R Resources/* "$stage/resources"
         popd
