@@ -71,6 +71,7 @@ class LLCEFLib
             // enable/disable features
             bool javascript_enabled = true;
             bool plugins_enabled = true;
+            bool media_stream_enabled = false;
             bool cookies_enabled = true;
             bool cache_enabled = true;
 
@@ -160,7 +161,7 @@ class LLCEFLib
         // utility function to post data to a URL
         void postData(std::string url, std::string data, std::string headers);
 
-        // set a cook in the CEF cookie store
+        // set a cookie in the CEF cookie store
         void setCookie(std::string url, std::string name, std::string value, std::string domain, std::string path, bool httponly, bool secure);
 
         // set page zoom factor (1.0 == normal)
@@ -264,13 +265,13 @@ class LLCEFLib
         // called when a URL is navigated to (and has a target name)
         void setOnNavigateURLCallback(std::function<void(std::string url, std::string target)> callback);
 
-		// called when an HTTP AUTH request is made
-		void setOnHTTPAuthCallback(std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> callback);
+        // called when an HTTP AUTH request is made
+        void setOnHTTPAuthCallback(std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> callback);
 
-		// called when a file download request is made
-		void setOnFileDownloadCallback(std::function<void(const std::string filename)> callback);
+        // called when a file download request is made
+        void setOnFileDownloadCallback(std::function<void(const std::string filename)> callback);
 
-private:
+    private:
         std::unique_ptr <LLCEFLibImpl> mImpl;
 };
 

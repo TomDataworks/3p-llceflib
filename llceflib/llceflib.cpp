@@ -76,7 +76,7 @@ void LLCEFLib::setCookie(std::string url, std::string name, std::string value, s
 {
     if (url.length() > 0)
     {
-        mImpl->setCookie(url, name, value, domain, path);
+         mImpl->setCookie(url, name, value, domain, path);
     }
 }
 
@@ -142,12 +142,12 @@ void LLCEFLib::setOnNavigateURLCallback(std::function<void(std::string url, std:
 
 void LLCEFLib::setOnHTTPAuthCallback(std::function<bool(const std::string host, const std::string realm, std::string& username, std::string& password)> callback)
 {
-	mImpl->setOnHTTPAuthCallback(callback);
+    mImpl->setOnHTTPAuthCallback(callback);
 }
 
 void LLCEFLib::setOnFileDownloadCallback(std::function<void(const std::string filename)> callback)
 {
-	mImpl->setOnFileDownloadCallback(callback);
+    mImpl->setOnFileDownloadCallback(callback);
 }
 
 void LLCEFLib::setCustomSchemes(std::vector<std::string> custom_schemes)

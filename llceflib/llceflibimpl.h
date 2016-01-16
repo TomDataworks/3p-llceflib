@@ -102,13 +102,13 @@ class LLCEFLibImpl :
         void setOnNavigateURLCallback(std::function<void(std::string, std::string)> callback);
         void onNavigateURL(std::string url, std::string target);
 
-		void setOnHTTPAuthCallback(std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> callback);
-		bool onHTTPAuth(const std::string host, const std::string realm, std::string& username, std::string& password);
+        void setOnHTTPAuthCallback(std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> callback);
+        bool onHTTPAuth(const std::string host, const std::string realm, std::string& username, std::string& password);
 
-		void setOnFileDownloadCallback(std::function<void(const std::string filename)> callback);
-		void onFileDownload(const std::string filename);
+        void setOnFileDownloadCallback(std::function<void(const std::string filename)> callback);
+        void onFileDownload(const std::string filename);
 
-		void setOnRequestExitCallback(std::function<void()> callback);
+        void setOnRequestExitCallback(std::function<void()> callback);
         void onRequestExit();
 
         void setOnCursorChangedCallback(std::function<void(LLCEFLib::ECursorType type, unsigned int cursor)> callback);
@@ -172,6 +172,7 @@ class LLCEFLibImpl :
         int mViewHeight;
         const int mViewDepth = 4;
         bool mSystemFlashEnabled;
+        bool mMediaStreamEnabled;
         std::vector<std::string> mCustomSchemes;
         std::function<void(unsigned char*, int, int, int, int, bool)> mOnPageChangedCallbackFunc;
         std::function<void(std::string)> mOnCustomSchemeURLCallbackFunc;
@@ -182,8 +183,8 @@ class LLCEFLibImpl :
         std::function<void()> mOnLoadStartCallbackFunc;
         std::function<void(int)> mOnLoadEndCallbackFunc;
         std::function<void(std::string, std::string)> mOnNavigateURLCallbackFunc;
-		std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> mOnHTTPAuthCallbackFunc;
-		std::function<void(const std::string filename)> mOnFileDownloadCallbackFunc;
+        std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> mOnHTTPAuthCallbackFunc;
+        std::function<void(const std::string filename)> mOnFileDownloadCallbackFunc;
         std::function<void()> mOnRequestExitCallbackFunc;
         std::function<void(LLCEFLib::ECursorType type, unsigned int cursor)> mOnCursorChangedCallbackFunc;
 
