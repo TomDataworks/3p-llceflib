@@ -16,6 +16,11 @@ set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Debug/lib
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Release/libcef_dll_wrapper.lib
              debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.lib
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.lib)
+elseif(UNIX)
+set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build_debug/libcef_dll/libcef_dll_wrapper.a
+             optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build_release/libcef_dll/libcef_dll_wrapper.a
+             debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.so
+             optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.so)
 endif(MSVC)
 
 if(APPLE)
@@ -34,6 +39,8 @@ llschemehandler.cpp
 
 if(WIN32)
   list(APPEND llceflib_SOURCE_FILES llceflibimpl_win.cpp)
+elseif(UNIX)
+  list(APPEND llceflib_SOURCE_FILES llceflibimpl_linux.cpp)
 elseif(APPLE)
   list(APPEND llceflib_SOURCE_FILES llceflibimpl_mac.mm)
 endif(WIN32)
@@ -56,4 +63,6 @@ if (MSVC)
 endif (MSVC)
 
 add_subdirectory(llceflib_host)
-add_subdirectory(tests/win32gl)
+if (MSVC)
+  add_subdirectory(tests/win32gl)
+endif (MSVC)

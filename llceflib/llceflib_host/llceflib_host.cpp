@@ -37,8 +37,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 }
 #endif
 
-// OS X Helper executable, we can probably share this between Win & Mac
-#ifdef __APPLE__
+// OS X and Unix Helper executable, we can probably share this between Win & Mac & Unix
+#if __APPLE__ || __linux__
 
 // Entry point function for sub-processes.
 int main(int argc, char* argv[])

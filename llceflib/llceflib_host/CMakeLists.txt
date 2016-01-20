@@ -6,6 +6,8 @@ if (MSVC)
   target_link_libraries(llceflib_host ${CEF_LIBS})
   set_target_properties(llceflib PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
   EMBED_MANIFEST(llceflib_host 1)
+elseif (UNIX)
+  target_link_libraries(llceflib_host ${CEF_LIBS})
 elseif (APPLE)
   include(BundleUtilities)
 

@@ -47,10 +47,16 @@ const std::string CEF_CHROME_VERSION_WIN = "47.0.2526.80";
 const std::string CEF_VERSION_OSX = "(CEF-OSX-3.2526.1364)";
 const std::string CEF_CHROME_VERSION_OSX = "47.0.2526.80";
 
+// version of CEF and the version of Chrome it represents on OS X
+const std::string CEF_VERSION_LINUX = "(CEF-OSX-3.2526.1369)";
+const std::string CEF_CHROME_VERSION_LINUX = "47.0.2526.111";
+
 // composite version for display
 #ifdef WIN32
 const std::string LLCEFLIB_VERSION = LLCEFLIB_BASE_VERSION + "-" + CEF_VERSION_WIN;
-#else
+#elif __linux__
+const std::string LLCEFLIB_VERSION = LLCEFLIB_BASE_VERSION + "-" + CEF_VERSION_LINUX;
+#elif __APPLE__
 const std::string LLCEFLIB_VERSION = LLCEFLIB_BASE_VERSION + "-" + CEF_VERSION_OSX;
 #endif
 

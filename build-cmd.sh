@@ -72,8 +72,43 @@ case "$AUTOBUILD_PLATFORM" in
         fail
      ;;
     "linux64")
-        echo "Not implemented"
-        fail
+        pushd "cef"
+            mkdir -p build_debug
+            pushd "build_debug"
+                cmake -G "Unix Makefiles" ../ -DCMAKE_BUILD_TYPE=Debug
+                make -j4 libcef_dll_wrapper
+                cp libcef_dll/libcef_dll_wrapper.a "$stage_lib_debug"
+            popd
+            mkdir -p build_release
+            pushd "build_release"
+                cmake -G "Unix Makefiles" ../ -DCMAKE_BUILD_TYPE=Release
+                make -j4 libcef_dll_wrapper
+                cp libcef_dll/libcef_dll_wrapper.a "$stage_lib_release"
+            popd
+            cp -a Debug/chrome-sandbox "$stage_bin_debug"
+            cp -a Debug/*.bin "$stage_bin_debug"
+            cp -a Debug/*.so "$stage_lib_debug"
+            cp -a Debug/chrome-sandbox "$stage_bin_release"
+            cp -a Debug/*.bin "$stage_bin_release"
+            cp -a Debug/*.so "$stage_lib_release"
+            cp -a Resources/* "$stage/resources"
+        popd
+        pushd "llceflib"
+            mkdir -p build_debug
+            pushd "build_debug"
+                cmake -G "Unix Makefiles" ../ -DCMAKE_BUILD_TYPE=Debug
+                make -j4
+                cp bin/* "$stage_bin_debug"
+                cp lib/* "$stage_lib_debug"
+            popd
+            mkdir -p build_release
+            pushd "build_release"
+                cmake -G "Unix Makefiles" ../ -DCMAKE_BUILD_TYPE=Release
+                make -j4
+                cp bin/* "$stage_bin_release"
+                cp lib/* "$stage_lib_release"
+            popd
+        popd
     ;;
     "windows")
         pushd "cef"

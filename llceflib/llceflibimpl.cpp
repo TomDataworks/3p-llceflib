@@ -87,7 +87,7 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 
 #ifdef WIN32
     CefMainArgs args(GetModuleHandle(NULL));
-#elif __APPLE__
+#elif __APPLE__ || __linux__
     CefMainArgs args(0, NULL);
 #endif
 
@@ -95,6 +95,8 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 
 #ifdef WIN32
     CefString(&settings.browser_subprocess_path) = "llceflib_host.exe";
+#elif __linux
+    CefString(&settings.browser_subprocess_path) = "./llceflib_host";
 #elif __APPLE__
     NSString* appBundlePath = [[NSBundle mainBundle] bundlePath];
     CefString(&settings.browser_subprocess_path) = [[NSString stringWithFormat: @"%@/Contents/Frameworks/LLCefLib Helper.app/Contents/MacOS/LLCefLib Helper", appBundlePath] UTF8String];
@@ -177,7 +179,7 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
     {
 #ifdef WIN32
         std::string cookiePath = ".\\cookies";
-#elif __APPLE__
+#elif __APPLE__ || __linux__
         std::string cookiePath = "./cookies";
 #endif
         if (user_settings.cookie_store_path.length())
