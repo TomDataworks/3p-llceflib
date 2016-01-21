@@ -11,6 +11,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(CMAKE_SKIP_RPATH TRUE)
+endif()
+
 if(MSVC)
 set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Debug/libcef_dll_wrapper.lib
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Release/libcef_dll_wrapper.lib
@@ -39,10 +43,10 @@ llschemehandler.cpp
 
 if(WIN32)
   list(APPEND llceflib_SOURCE_FILES llceflibimpl_win.cpp)
-elseif(UNIX)
-  list(APPEND llceflib_SOURCE_FILES llceflibimpl_linux.cpp)
 elseif(APPLE)
   list(APPEND llceflib_SOURCE_FILES llceflibimpl_mac.mm)
+elseif(UNIX)
+  list(APPEND llceflib_SOURCE_FILES llceflibimpl_linux.cpp)
 endif(WIN32)
 
 set(llceflib_HEADER_FILES
@@ -54,7 +58,15 @@ llrenderhandler.h
 llschemehandler.h
 )
 
-add_library(llceflib STATIC ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
+if (UNIX AND NOT APPLE)
+  add_definitions(-fPIC)
+endif (UNIX AND NOT APPLE)
+
+if (MSVC OR APPLE)
+  add_library(llceflib STATIC ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
+else (MSVC OR APPLE)
+  add_library(llceflib SHARED ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
+endif (MSVC OR APPLE)
 
 target_link_libraries(llceflib ${CEF_LIBS})
 

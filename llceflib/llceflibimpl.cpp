@@ -87,19 +87,20 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 
 #ifdef WIN32
     CefMainArgs args(GetModuleHandle(NULL));
-#elif __APPLE__ || __linux__
+#else
     CefMainArgs args(0, NULL);
 #endif
 
     CefSettings settings;
-
 #ifdef WIN32
     CefString(&settings.browser_subprocess_path) = "llceflib_host.exe";
-#elif __linux
-    CefString(&settings.browser_subprocess_path) = "./llceflib_host";
 #elif __APPLE__
     NSString* appBundlePath = [[NSBundle mainBundle] bundlePath];
     CefString(&settings.browser_subprocess_path) = [[NSString stringWithFormat: @"%@/Contents/Frameworks/LLCefLib Helper.app/Contents/MacOS/LLCefLib Helper", appBundlePath] UTF8String];
+#elif __linux__
+    CefString(&settings.browser_subprocess_path) = "./llceflib_host";
+    // Disable sandbox for now
+    settings.no_sandbox = true;
 #endif
 
     // change settings based on what was passed in
