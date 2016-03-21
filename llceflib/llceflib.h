@@ -277,8 +277,11 @@ class LLCEFLib
         // called when a file download request is made
         void setOnFileDownloadCallback(std::function<void(const std::string filename)> callback);
 
+        // called when the file picker dialog is shown
+        void setOnFileDialogCallback(std::function<const std::string()> callback);
+
     private:
-        std::unique_ptr <LLCEFLibImpl> mImpl;
+        std::unique_ptr<LLCEFLibImpl> mImpl;
 };
 
 #endif // _LLCEFLIB

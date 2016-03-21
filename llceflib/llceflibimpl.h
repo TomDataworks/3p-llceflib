@@ -108,6 +108,9 @@ class LLCEFLibImpl :
         void setOnFileDownloadCallback(std::function<void(const std::string filename)> callback);
         void onFileDownload(const std::string filename);
 
+        void setOnFileDialogCallback(std::function<const std::string()> callback);
+        const std::string onFileDialog();
+
         void setOnRequestExitCallback(std::function<void()> callback);
         void onRequestExit();
 
@@ -185,6 +188,7 @@ class LLCEFLibImpl :
         std::function<void(std::string, std::string)> mOnNavigateURLCallbackFunc;
         std::function<bool(const std::string host, const std::string realm, std::string&, std::string&)> mOnHTTPAuthCallbackFunc;
         std::function<void(const std::string filename)> mOnFileDownloadCallbackFunc;
+        std::function<const std::string()> mOnFileDialogCallbackFunc;
         std::function<void()> mOnRequestExitCallbackFunc;
         std::function<void(LLCEFLib::ECursorType type, unsigned int cursor)> mOnCursorChangedCallbackFunc;
 

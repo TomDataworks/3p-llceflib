@@ -42,7 +42,6 @@ CefRefPtr<CefRenderHandler> LLBrowserClient::GetRenderHandler()
     return mLLRenderHandler;
 }
 
-#ifdef LATEST_CEF_VERSION
 bool LLBrowserClient::OnBeforePopup(CefRefPtr<CefBrowser> browser,
                                     CefRefPtr<CefFrame> frame,
                                     const CefString& target_url,
@@ -54,17 +53,6 @@ bool LLBrowserClient::OnBeforePopup(CefRefPtr<CefBrowser> browser,
                                     CefRefPtr<CefClient>& client,
                                     CefBrowserSettings& settings,
                                     bool* no_javascript_access)
-#else
-bool LLBrowserClient::OnBeforePopup(CefRefPtr<CefBrowser> browser,
-                                    CefRefPtr<CefFrame> frame,
-                                    const CefString& target_url,
-                                    const CefString& target_frame_name,
-                                    const CefPopupFeatures& popupFeatures,
-                                    CefWindowInfo& windowInfo,
-                                    CefRefPtr<CefClient>& client,
-                                    CefBrowserSettings& settings,
-                                    bool* no_javascript_access)
-#endif
 {
     CEF_REQUIRE_IO_THREAD();
 
@@ -238,17 +226,10 @@ bool LLBrowserClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser, CefRefPt
     }
 }
 
-#ifdef LATEST_CEF_VERSION
 bool LLBrowserClient::OnQuotaRequest(CefRefPtr<CefBrowser> browser,
                                      const CefString& origin_url,
                                      int64 new_size,
                                      CefRefPtr<CefRequestCallback> callback)
-#else
-bool LLBrowserClient::OnQuotaRequest(CefRefPtr<CefBrowser> browser,
-                                     const CefString& origin_url,
-                                     int64 new_size,
-                                     CefRefPtr<CefQuotaCallback> callback)
-#endif
 {
     CEF_REQUIRE_IO_THREAD();
 
@@ -287,4 +268,31 @@ void LLBrowserClient::OnBeforeDownload(CefRefPtr<CefBrowser> browser,
     CEF_REQUIRE_UI_THREAD();
 
     mParent->onFileDownload(std::string(suggested_name));
+}
+
+bool LLBrowserClient::OnFileDialog(CefRefPtr<CefBrowser> browser,
+                                    FileDialogMode mode,
+                                    const CefString& title,
+                                    const CefString& default_file_path,
+                                    const std::vector<CefString>& accept_filters,
+                                    int selected_accept_filter,
+                                    CefRefPtr<CefFileDialogCallback> callback)
+{
+    CEF_REQUIRE_UI_THREAD();
+
+    const CefString file_path = mParent->onFileDialog();
+    if (file_path.length())
+    {
+        std::vector<CefString> file_paths;
+        file_paths.push_back(CefString(file_path));
+
+        const int file_path_index = 0;
+        callback->Continue(file_path_index, file_paths);
+    }
+    else
+    {
+        callback->Cancel();
+    }
+
+    return true;
 }

@@ -43,7 +43,8 @@ class LLBrowserClient :
     public CefDisplayHandler,
     public CefLoadHandler,
     public CefRequestHandler,
-    public CefDownloadHandler
+    public CefDownloadHandler,
+    public CefDialogHandler
 {
     public:
         LLBrowserClient(LLCEFLibImpl* parent, LLRenderHandler* render_handler);
@@ -53,20 +54,13 @@ class LLBrowserClient :
 
         // CefLifeSpanHandler overrides
         CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE{ return this; }
-#ifdef LATEST_CEF_VERSION
+
         bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
                            const CefString& target_url, const CefString& target_frame_name,
                            CefLifeSpanHandler::WindowOpenDisposition target_disposition,
                            bool user_gesture, const CefPopupFeatures& popupFeatures,
                            CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client,
                            CefBrowserSettings& settings, bool* no_javascript_access) OVERRIDE;
-#else
-        bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-                           const CefString& target_url, const CefString& target_frame_name, const
-                           CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo,
-                           CefRefPtr<CefClient>& client, CefBrowserSettings& settings,
-                           bool* no_javascript_access) OVERRIDE;
-#endif
         void OnAfterCreated(CefRefPtr<CefBrowser> browser) OVERRIDE;
         bool RunModal(CefRefPtr<CefBrowser> browser) OVERRIDE;
         bool DoClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
@@ -89,23 +83,27 @@ class LLBrowserClient :
         bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect) OVERRIDE;
         bool GetAuthCredentials(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, bool isProxy, const CefString& host, int port, const CefString& realm, const CefString& scheme, CefRefPtr<CefAuthCallback> callback) OVERRIDE;
 
-#ifdef LATEST_CEF_VERSION
         bool OnQuotaRequest(CefRefPtr<CefBrowser> browser,
                             const CefString& origin_url,
                             int64 new_size,
                             CefRefPtr<CefRequestCallback> callback) OVERRIDE;
-#else
-        bool OnQuotaRequest(CefRefPtr<CefBrowser> browser,
-                            const CefString& origin_url,
-                            int64 new_size,
-                            CefRefPtr<CefQuotaCallback> callback) OVERRIDE;
-#endif
+
         // CefDownloadHandler overrides
         CefRefPtr<CefDownloadHandler> GetDownloadHandler() OVERRIDE { return this; }
         void OnBeforeDownload(CefRefPtr<CefBrowser> browser,
                               CefRefPtr<CefDownloadItem> download_item,
                               const CefString& suggested_name,
                               CefRefPtr<CefBeforeDownloadCallback> callback) OVERRIDE;
+
+        // CefDialogHandler orerrides
+        CefRefPtr<CefDialogHandler> GetDialogHandler() OVERRIDE { return this; }
+        bool OnFileDialog(CefRefPtr<CefBrowser> browser,
+                            FileDialogMode mode,
+                            const CefString& title,
+                            const CefString& default_file_path,
+                            const std::vector<CefString>& accept_filters,
+                            int selected_accept_filter,
+                            CefRefPtr<CefFileDialogCallback> callback) OVERRIDE;
 
     private:
         LLCEFLibImpl* mParent;

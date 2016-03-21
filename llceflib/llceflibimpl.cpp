@@ -127,7 +127,7 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
     }
 
     // Control logging output and location
-    settings.log_severity = user_settings.debug_output ? LOGSEVERITY_DEFAULT : LOGSEVERITY_DISABLE;
+    settings.log_severity = user_settings.debug_output ? LOGSEVERITY_VERBOSE : LOGSEVERITY_DISABLE;
     if (user_settings.debug_output)
     {
         std::string log_file(user_settings.log_file);
@@ -190,16 +190,12 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 
         mContextHandler = new LLContextHandler(cookiePath.c_str());
 
-#ifdef LATEST_CEF_VERSION
         CefRequestContextSettings contextSettings;
         if (user_settings.cache_enabled && user_settings.cache_path.length())
         {
             CefString(&contextSettings.cache_path) = user_settings.cache_path;
         }
         rc = CefRequestContext::CreateContext(contextSettings, mContextHandler.get());
-#else
-        rc = CefRequestContext::CreateContext(mContextHandler);
-#endif
     }
 
     CefString url = "";
@@ -281,6 +277,11 @@ void LLCEFLibImpl::setOnHTTPAuthCallback(std::function<bool(const std::string ho
 void LLCEFLibImpl::setOnFileDownloadCallback(std::function<void(const std::string filename)> callback)
 {
     mOnFileDownloadCallbackFunc = callback;
+}
+
+void LLCEFLibImpl::setOnFileDialogCallback(std::function<const std::string()> callback)
+{
+    mOnFileDialogCallbackFunc = callback;
 }
 
 void LLCEFLibImpl::setSize(int width, int height)
@@ -407,6 +408,16 @@ void LLCEFLibImpl::onFileDownload(const std::string filename)
     }
 }
 
+const std::string LLCEFLibImpl::onFileDialog()
+{
+    if (mOnFileDialogCallbackFunc)
+    {
+        return mOnFileDialogCallbackFunc();
+    }
+
+    return std::string();
+}
+
 int LLCEFLibImpl::getDepth()
 {
     return mViewDepth;
@@ -453,15 +464,6 @@ void LLCEFLibImpl::postData(std::string url, std::string data, std::string heade
 
 void LLCEFLibImpl::setCookie(std::string url, std::string name, std::string value, std::string domain, std::string path)
 {
-#ifndef LATEST_CEF_VERSION
-    // CEF 2171 SetCookie() needs to run on IO thread
-    if (! CefCurrentlyOn(TID_IO))
-    {
-        CefPostTask(TID_IO, base::Bind(&LLCEFLibImpl::setCookie, this, url, name, value, domain, path));
-        return;
-    }
-#endif
-
     CefRefPtr<CefCookieManager> manager = mContextHandler->GetCookieManager();
     CefCookie cookie;
     CefString(&cookie.name) = name;
@@ -478,13 +480,8 @@ void LLCEFLibImpl::setCookie(std::string url, std::string name, std::string valu
     cookie.expires.day_of_week = 5;
     cookie.expires.day_of_month = 10;
 
-#ifdef LATEST_CEF_VERSION
     manager->SetCookie(url, cookie, nullptr);
     manager->FlushStore(nullptr);
-#else
-    manager->SetCookie(url, cookie);
-    manager->FlushStore(mFlushStoreCallback);
-#endif
 }
 
 void LLCEFLibImpl::setPageZoom(double zoom_val)

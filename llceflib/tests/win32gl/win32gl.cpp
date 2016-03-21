@@ -94,6 +94,33 @@ void onFileDownload(std::string filename)
 	MessageBoxA(0, filename.c_str(), "File download", 0);
 }
 
+const std::string onFileDialog()
+{
+    OPENFILENAME ofn;
+    char szFile[260];
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = GetDesktopWindow();
+    ofn.lpstrFile = szFile;
+    ofn.lpstrFile[0] = '\0';
+    ofn.nMaxFile = sizeof(szFile);
+    ofn.lpstrFilter = "JPEG files\0*.jpg\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    if (GetOpenFileName(&ofn) == TRUE)
+    {
+        return std::string(ofn.lpstrFile);
+    }
+    else
+    {
+        return std::string();
+    }
+}
+
 void onRequestExitCallback()
 {
     PostQuitMessage(0);
@@ -109,6 +136,7 @@ void init(HWND hWnd)
 	mLLCEFLib->setOnNavigateURLCallback(std::bind(onNavigateURL, _1, _2));
     mLLCEFLib->setOnRequestExitCallback(std::bind(onRequestExitCallback));
 	mLLCEFLib->setOnFileDownloadCallback(std::bind(onFileDownload, _1));
+    mLLCEFLib->setOnFileDialogCallback(std::bind(onFileDialog));
 
     LLCEFLib::LLCEFLibSettings settings;
     settings.initial_width = gTextureWidth;
@@ -116,6 +144,7 @@ void init(HWND hWnd)
     settings.javascript_enabled = true;
     settings.cookies_enabled = true;
     settings.plugins_enabled = true;
+    settings.media_stream_enabled = true;
     settings.cookie_store_path = "c:\\win32gl-cef-cookies";
     settings.user_agent_substring = mLLCEFLib->makeCompatibleUserAgentString("Win32GL");
     settings.accept_language_list = "en-US";
