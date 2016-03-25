@@ -20,7 +20,7 @@ set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Debug/lib
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Release/libcef_dll_wrapper.lib
              debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.lib
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.lib)
-elseif(UNIX)
+elseif(UNIX AND NOT APPLE)
 set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build_debug/libcef_dll/libcef_dll_wrapper.a
              optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build_release/libcef_dll/libcef_dll_wrapper.a
              debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.so
@@ -62,11 +62,7 @@ if (UNIX AND NOT APPLE)
   add_definitions(-fPIC)
 endif (UNIX AND NOT APPLE)
 
-if (MSVC OR APPLE)
-  add_library(llceflib STATIC ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
-else (MSVC OR APPLE)
-  add_library(llceflib SHARED ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
-endif (MSVC OR APPLE)
+add_library(llceflib STATIC ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
 
 target_link_libraries(llceflib ${CEF_LIBS})
 
