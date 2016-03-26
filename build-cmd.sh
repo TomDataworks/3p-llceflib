@@ -88,9 +88,9 @@ case "$AUTOBUILD_PLATFORM" in
             cp -a Debug/chrome-sandbox "$stage_bin_debug"
             cp -a Debug/*.bin "$stage_bin_debug"
             cp -a Debug/*.so "$stage_lib_debug"
-            cp -a Debug/chrome-sandbox "$stage_bin_release"
-            cp -a Debug/*.bin "$stage_bin_release"
-            cp -a Debug/*.so "$stage_lib_release"
+            cp -a Release/chrome-sandbox "$stage_bin_release"
+            cp -a Release/*.bin "$stage_bin_release"
+            cp -a Release/*.so "$stage_lib_release"
             cp -a Resources/* "$stage/resources"
         popd
         pushd "llceflib"
