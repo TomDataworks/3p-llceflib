@@ -38,9 +38,14 @@
 #include "include/base/cef_bind.h"
 #include "include/wrapper/cef_closure_task.h"
 
-
 #ifdef __APPLE__
 #import <Cocoa/Cocoa.h>
+#endif
+
+#if __linux__
+#include <libgen.h>
+#include <sys/types.h>
+#include <pwd.h>
 #endif
 
 LLCEFLibImpl::LLCEFLibImpl() :
@@ -98,7 +103,15 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
     NSString* appBundlePath = [[NSBundle mainBundle] bundlePath];
     CefString(&settings.browser_subprocess_path) = [[NSString stringWithFormat: @"%@/Contents/Frameworks/LLCefLib Helper.app/Contents/MacOS/LLCefLib Helper", appBundlePath] UTF8String];
 #elif __linux__
-    CefString(&settings.browser_subprocess_path) = "./llceflib_host";
+    std::string plugin_process_path;
+    char path[ 4096 ];
+    int len = readlink ("/proc/self/exe", path, sizeof(path));
+    if(len != -1)
+    {
+        path[len] = 0;
+        plugin_process_path = dirname(path) ;
+    }
+    CefString(&settings.browser_subprocess_path) = plugin_process_path + "/llceflib_host";
     // Disable sandbox for now
     settings.no_sandbox = true;
 #endif
