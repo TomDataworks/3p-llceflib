@@ -62,11 +62,7 @@ if (UNIX AND NOT APPLE)
   add_definitions(-fPIC)
 endif (UNIX AND NOT APPLE)
 
-if (MSVC OR APPLE)
-  add_library(llceflib STATIC ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
-else (MSVC OR APPLE)
-  add_library(llceflib SHARED ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
-endif (MSVC OR APPLE)
+add_library(llceflib STATIC ${llceflib_SOURCE_FILES} ${llceflib_HEADER_FILES})
 
 target_link_libraries(llceflib ${CEF_LIBS})
 
