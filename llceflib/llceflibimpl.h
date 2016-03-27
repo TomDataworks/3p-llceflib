@@ -121,6 +121,7 @@ class LLCEFLibImpl :
         void mouseMove(int x, int y);
         void nativeMouseEvent(uint32_t msg, uint32_t wparam, uint64_t lparam);
 
+#ifndef __linux__
         void keyboardEventOSX(uint32_t eventType, uint32_t modifiers, const char* characters, const char* unmodChars, bool repeat, uint32_t keyCode);
 
         void nativeKeyboardEvent(uint32_t msg, uint32_t wparam, uint64_t lparam);
@@ -135,6 +136,9 @@ class LLCEFLibImpl :
             uint32_t native_scan_code,
             uint32_t native_virtual_key,
             uint32_t native_modifiers);
+#else
+        void nativeKeyboardEvent( LLCEFLib::EKeyEvent key_event, uint32_t native_scan_code, uint32_t native_virtual_key, uint32_t native_modifiers );
+#endif
 
         void mouseWheel(int deltaX, int deltaY);
         void setFocus(bool focus);
