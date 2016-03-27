@@ -181,6 +181,7 @@ void LLCEFLib::mouseMove(int x, int y)
     mImpl->mouseMove(x, y);
 }
 
+#ifndef __linux__
 void LLCEFLib::nativeKeyboardEvent(uint32_t msg, uint32_t wparam, uint64_t lparam)
 {
     mImpl->nativeKeyboardEvent(msg, wparam, lparam);
@@ -213,6 +214,12 @@ void LLCEFLib::keyboardEvent(
 {
     mImpl->keyboardEvent(key_event, key_code, utf8_text, modifiers, native_scan_code, native_virtual_key, native_modifiers);
 }
+#else
+void LLCEFLib::nativeKeyboardEvent( LLCEFLib::EKeyEvent key_event, uint32_t native_scan_code, uint32_t native_virtual_key, uint32_t native_modifiers )
+{
+	mImpl->	nativeKeyboardEvent( key_event, native_scan_code, native_virtual_key, native_modifiers );
+}
+#endif
 
 void LLCEFLib::mouseWheel(int deltaX, int deltaY)
 {
