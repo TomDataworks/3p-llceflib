@@ -41,9 +41,9 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     "linux64")
     CEF_PLATFORM="linux64"
-    CEF_VERSION_FULL="3.2623.1395.g3034273"
+    CEF_VERSION_FULL="3.2526.1373.gb660893"
     CEF_PACKAGE_EXTENSION="zip"
-    CEF_MD5="b7ad49af178204e3310468ccb60b6950"
+    CEF_MD5="e460d5f628e231f349be4a9521c2786b"
     ;;
     "windows")
     CEF_PLATFORM="windows32"
