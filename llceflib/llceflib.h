@@ -201,7 +201,7 @@ class LLCEFLib
         // native keyboard event for OS X
         void nativeKeyboardEventOSX(void* nsEvent);
 #else
-		void nativeKeyboardEvent( EKeyEvent key_event, uint32_t native_scan_code, uint32_t native_virtual_key, uint32_t native_modifiers );
+        void nativeKeyboardEvent( EKeyEvent key_event, uint32_t native_scan_code, uint32_t native_virtual_key, uint32_t native_modifiers );
 #endif
 
         // set/remove focus to/from the virtual browser
