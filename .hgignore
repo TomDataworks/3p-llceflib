@@ -1,7 +1,13 @@
 syntax: glob
 
+CMakeCache.txt
+*.a
+*.dylib
 cef/
 cef_binary*
 llceflib/build/
-stage
+llceflib/bin/
+llceflib/CMakeFiles/
+stage/
+*/Objects-normal/
 
