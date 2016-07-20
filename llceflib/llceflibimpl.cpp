@@ -49,9 +49,9 @@
 #endif
 
 LLCEFLibImpl::LLCEFLibImpl() :
+    mBrowser(nullptr),
     mViewWidth(0),
     mViewHeight(0),
-    mBrowser(0),
     mSystemFlashEnabled(false),
     mMediaStreamEnabled(false)
 {
