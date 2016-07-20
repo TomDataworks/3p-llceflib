@@ -16,16 +16,21 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(MSVC)
-set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Debug/libcef_dll_wrapper.lib
-             optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Release/libcef_dll_wrapper.lib
-             debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.lib
-             optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.lib)
+  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Debug/libcef_dll_wrapper.lib
+               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Release/libcef_dll_wrapper.lib
+               debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.lib
+               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.lib)
+elseif(APPLE)
+  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/libcef_dll/Debug/libcef_dll_wrapper.a
+               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/libcef_dll/Release/libcef_dll_wrapper.a
+               debug "${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/Chromium Embedded Framework.framework"
+               optimized "${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/Chromium Embedded Framework.framework")
 elseif(UNIX)
-set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build_debug/libcef_dll/libcef_dll_wrapper.a
-             optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build_release/libcef_dll/libcef_dll_wrapper.a
-             debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.so
-             optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.so)
-endif(MSVC)
+  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build_debug/libcef_dll/libcef_dll_wrapper.a
+               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build_release/libcef_dll/libcef_dll_wrapper.a
+               debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.so
+               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.so)
+endif()
 
 if(APPLE)
   set(CMAKE_CXX_FLAGS "-x objective-c++")
@@ -34,11 +39,11 @@ endif(APPLE)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../cef)
 
 set(llceflib_SOURCE_FILES
-llbrowserclient.cpp
-llceflib.cpp
-llceflibimpl.cpp
-llrenderhandler.cpp
-llschemehandler.cpp
+    llbrowserclient.cpp
+    llceflib.cpp
+    llceflibimpl.cpp
+    llrenderhandler.cpp
+    llschemehandler.cpp
 )
 
 if(WIN32)
@@ -50,12 +55,12 @@ elseif(UNIX)
 endif(WIN32)
 
 set(llceflib_HEADER_FILES
-llbrowserclient.h
-llceflib.h
-llceflibimpl.h
-llceflibplatform.h
-llrenderhandler.h
-llschemehandler.h
+    llbrowserclient.h
+    llceflib.h
+    llceflibimpl.h
+    llceflibplatform.h
+    llrenderhandler.h
+    llschemehandler.h
 )
 
 if (UNIX AND NOT APPLE)
