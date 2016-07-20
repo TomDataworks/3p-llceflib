@@ -46,22 +46,22 @@ case "$AUTOBUILD_PLATFORM" in
     "darwin")
         pushd "cef"
             export GYP_GENERATORS=xcode GYP_DEFINES=mac_sdk=10.8
+            XCODE_FLAGS="-sdk macosx10.11 -mmacosx-version-min=10.8 -configuration Release"
             #sh ./cef_create_projects.sh 
-            cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
-            xcodebuild -target libcef_dll_wrapper \
-                -sdk macosx10.11 -mmacosx-version-min=10.8 -configuration Release
-
+            cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" \
+                -DCMAKE_BUILD_TYPE=Release 
+            xcodebuild -target libcef_dll_wrapper ${XCODE_FLAGS}
+            xcodebuild -target "cefclient Helper" ${XCODE_FLAGS}
 
             cp -R cefclient/resources/* "${stage}/resources"
             cp libcef_dll/Release/libcef_dll_wrapper.a "${stage_lib_release}"
             cp -R Release/"Chromium Embedded Framework.framework" "${stage_lib_release}"
+            cp -R cefclient/Release/"cefclient Helper.app" "${stage_bin_release}"
         popd
         pushd "llceflib"
             cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" -DCMAKE_BUILD_TYPE=Release
-            xcodebuild -target llceflib -sdk macosx10.11 \
-                -mmacosx-version-min=10.8 -configuration Release
-            xcodebuild -target llceflib_host -sdk macosx10.11 \
-                -mmacosx-version-min=10.8 -configuration Release
+            xcodebuild -target llceflib ${XCODE_FLAGS}
+            xcodebuild -target llceflib_host ${XCODE_FLAGS}
 
             cp "lib/Release/libllceflib.a" "${stage_lib_release}"
             cp -R "bin/Release/LLCefLib Helper.app" "${stage_lib_release}"
