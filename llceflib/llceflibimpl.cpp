@@ -34,7 +34,6 @@
 #include "llbrowserclient.h"
 #include "llcontexthandler.h"
 
-#include "include/cef_runnable.h"
 #include "include/base/cef_bind.h"
 #include "include/wrapper/cef_closure_task.h"
 
@@ -770,8 +769,12 @@ std::string LLCEFLibImpl::makeCompatibleUserAgentString(const std::string base)
     std::string frag = "(" + base + ")" + " Chrome/";
 #ifdef WIN32
     frag += CEF_CHROME_VERSION_WIN;
-#else
+#elif __linux__
+	frag += CEF_CHROME_VERSION_LINUX;
+#elif __APPLE__
     frag += CEF_CHROME_VERSION_OSX;
+#else
+#error "Platform not supported.
 #endif
     return frag;
 }
