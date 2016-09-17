@@ -244,7 +244,6 @@ void LLBrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 
     if (mBrowserList.empty())
     {
-        CefQuitMessageLoop();
         mParent->onRequestExit();
     }
 }
