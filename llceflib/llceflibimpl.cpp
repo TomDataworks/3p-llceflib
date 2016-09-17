@@ -224,9 +224,7 @@ void LLCEFLibImpl::update()
 
 void LLCEFLibImpl::shutdown()
 {
-#if !defined(__APPLE__)
     CefShutdown();
-#endif
 }
 
 void LLCEFLibImpl::setOnPageChangedCallback(std::function<void(unsigned char*, int, int, int, int, bool)> callback)
