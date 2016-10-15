@@ -196,6 +196,8 @@ class LLCEFLibImpl :
         std::function<void()> mOnRequestExitCallbackFunc;
         std::function<void(LLCEFLib::ECursorType type, unsigned int cursor)> mOnCursorChangedCallbackFunc;
 
+		void convertInputCoords(int& x, int& y);
+
         CefRefPtr<FlushStoreCallback> mFlushStoreCallback;
 
         IMPLEMENT_REFCOUNTING(LLCEFLibImpl);

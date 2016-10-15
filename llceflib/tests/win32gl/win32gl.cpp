@@ -85,13 +85,13 @@ void onPageChangedCallback(unsigned char* pixels, int x, int y, int width, int h
 
 void onNavigateURL(std::string url, std::string target)
 {
-	mLLCEFLib->navigate(url);
+    mLLCEFLib->navigate(url);
 }
 
 
 void onFileDownload(std::string filename)
 {
-	MessageBoxA(0, filename.c_str(), "File download", 0);
+    MessageBoxA(0, filename.c_str(), "File download", 0);
 }
 
 const std::string onFileDialog()
@@ -133,9 +133,9 @@ void init(HWND hWnd)
     mLLCEFLib = new LLCEFLib();
 
     mLLCEFLib->setOnPageChangedCallback(std::bind(onPageChangedCallback, _1, _2, _3, _4, _5, _6));
-	mLLCEFLib->setOnNavigateURLCallback(std::bind(onNavigateURL, _1, _2));
+    mLLCEFLib->setOnNavigateURLCallback(std::bind(onNavigateURL, _1, _2));
     mLLCEFLib->setOnRequestExitCallback(std::bind(onRequestExitCallback));
-	mLLCEFLib->setOnFileDownloadCallback(std::bind(onFileDownload, _1));
+    mLLCEFLib->setOnFileDownloadCallback(std::bind(onFileDownload, _1));
     mLLCEFLib->setOnFileDialogCallback(std::bind(onFileDialog));
 
     LLCEFLib::LLCEFLibSettings settings;
@@ -164,24 +164,24 @@ void update()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // TODO - move
     glLoadIdentity();
 
     glEnable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex2d(mAppWindowWidth, 0);
+	glColor3f(1.0f, 1.0f, 1.0f);
 
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex2d(0, 0);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex2d(mAppWindowWidth, 0);
 
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex2d(0, mAppWindowHeight);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex2d(0, 0);
 
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex2d(mAppWindowWidth, mAppWindowHeight);
-    glEnd();
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex2d(0, mAppWindowHeight);
+
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex2d(mAppWindowWidth, mAppWindowHeight);
+	glEnd();
 
     mLLCEFLib->update();
 }
@@ -217,8 +217,10 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     break;
 
                 case ID_TESTS_SETACOOKIE:
+                {
                     mLLCEFLib->setCookie("http://callum.com", "cookie_name", "cookie_value", ".callum.com", "/", true, true);
                     break;
+                }
 
                 case ID_TESTS_OPENDEVELOPERCONSOLE:
                     mLLCEFLib->showDevTools(true);
@@ -233,19 +235,19 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             break;
 
-		case WM_LBUTTONDBLCLK:
-		{
-			int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
-			int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
-			mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_LEFT, LLCEFLib::ME_MOUSE_DOUBLE_CLICK, x, y);
-			return 0;
-		}
+        case WM_LBUTTONDBLCLK:
+        {
+            int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
+            int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
+			mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_LEFT, LLCEFLib::ME_MOUSE_DOUBLE_CLICK, x, mAppWindowHeight - y);
+            return 0;
+        }
 
         case WM_LBUTTONDOWN:
         {
             int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
             int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
-            mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_LEFT, LLCEFLib::ME_MOUSE_DOWN, x, y);
+			mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_LEFT, LLCEFLib::ME_MOUSE_DOWN, x, mAppWindowHeight - y);
             mLLCEFLib->setFocus(true);
             return 0;
         };
@@ -254,7 +256,7 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
             int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
-            mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_LEFT, LLCEFLib::ME_MOUSE_UP, x, y);
+			mLLCEFLib->mouseButton(LLCEFLib::MB_MOUSE_BUTTON_LEFT, LLCEFLib::ME_MOUSE_UP, x, mAppWindowHeight - y);
             return 0;
         };
 
@@ -278,7 +280,7 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             int x = (LOWORD(lParam) * gTextureWidth) / mAppWindowWidth;
             int y = (HIWORD(lParam) * gTextureHeight) / mAppWindowHeight;
-            mLLCEFLib->mouseMove(x, y);
+			mLLCEFLib->mouseMove(x, mAppWindowHeight - y);
             return 0;
         };
 
@@ -320,10 +322,29 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 /////////////////////////////////////////////////////////////////////////////////
 //
+void initConsole()
+{
+	AllocConsole();
+	freopen_s(&gConsole, "CON", "w", stdout);
+	freopen_s(&gConsole, "CON", "w", stderr);
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+void closeConsole()
+{
+	fclose(gConsole);
+	FreeConsole();
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	initConsole();
+	
     WNDCLASS wc;
-	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC | CS_DBLCLKS;
+    wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC | CS_DBLCLKS;
     wc.lpfnWndProc = (WNDPROC)window_proc;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
@@ -336,14 +357,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     RegisterClass(&wc);
 
     RECT window_rect;
-    SetRect(&window_rect, 0, 0, mAppWindowWidth, mAppWindowHeight);
+	SetRect(&window_rect, 0, 0, mAppWindowWidth, mAppWindowHeight + GetSystemMetrics(SM_CYMENU));
 
     DWORD ex_style = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
     DWORD style = WS_OVERLAPPEDWINDOW;
     AdjustWindowRectEx(&window_rect, style, FALSE, ex_style);
 
     HWND hWnd = CreateWindowEx(ex_style, "Win32GL", "Win32GL LLCEFLib test", style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-                               80, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top,
+                               720, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top,
                                NULL, NULL, hInstance, NULL);
 
     static  PIXELFORMATDESCRIPTOR pfd =
@@ -405,6 +426,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ReleaseDC(hWnd, hDC);
     DestroyWindow(hWnd);
     UnregisterClass("Win32GL", hInstance);
+
+	closeConsole();
 
     return 0;
 }
