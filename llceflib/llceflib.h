@@ -40,12 +40,12 @@ class LLCEFLibImpl;
 const std::string LLCEFLIB_BASE_VERSION = "1.6.0";
 
 // version of CEF and the version of Chrome it represents on Windows
-const std::string CEF_VERSION_WIN = "(CEF-WIN-3.2785.1478)";
-const std::string CEF_CHROME_VERSION_WIN = "53.0.2785.101";
+const std::string CEF_VERSION_WIN = "(CEF-WIN-3.2526.1364)";
+const std::string CEF_CHROME_VERSION_WIN = "47.0.2526.80";
 
 // version of CEF and the version of Chrome it represents on OS X
-const std::string CEF_VERSION_OSX = "(CEF-OSX-3.2785.1478)";
-const std::string CEF_CHROME_VERSION_OSX = "53.0.2785.101";
+const std::string CEF_VERSION_OSX = "(CEF-OSX-3.2526.1364)";
+const std::string CEF_CHROME_VERSION_OSX = "47.0.2526.80";
 
 // version of CEF and the version of Chrome it represents on Linux
 const std::string CEF_VERSION_LINUX = "(CEF-OSX-3.2526.1368)";

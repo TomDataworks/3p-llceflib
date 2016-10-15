@@ -62,6 +62,7 @@ class LLBrowserClient :
                            CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client,
                            CefBrowserSettings& settings, bool* no_javascript_access) OVERRIDE;
         void OnAfterCreated(CefRefPtr<CefBrowser> browser) OVERRIDE;
+        bool RunModal(CefRefPtr<CefBrowser> browser) OVERRIDE;
         bool DoClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
         void OnBeforeClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
 
@@ -74,7 +75,7 @@ class LLBrowserClient :
 
         // CefLoadHandler overrides
         CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE{ return this; }
-        void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transition_type) OVERRIDE;
+        void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame) OVERRIDE;
         void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) OVERRIDE;
 
         // CefRequestHandler overrides

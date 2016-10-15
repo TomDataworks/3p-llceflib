@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CEF_NAME="llceflib"
-CEF_VERSION_MAIN="3.2785"
+CEF_VERSION_MAIN="3.2526"
 
 # turn on verbose debugging output for parabuild logs.
 set -x
@@ -29,9 +29,9 @@ pushd "${TOP}"
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
     CEF_PLATFORM="macosx64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1478.gaab5543"
-    CEF_PACKAGE_EXTENSION="tar.bz2"
-    CEF_MD5="67d40653b5502482b42e48ca8008936a"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1364.gf6bf57b"
+    CEF_PACKAGE_EXTENSION="7z"
+    CEF_MD5="e46f9d00a6950bc0268a03fa24d4ec80"
     ;;
     "linux")
     CEF_PLATFORM="linux32"
@@ -47,15 +47,15 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     "windows")
     CEF_PLATFORM="windows32"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1478.gaab5543"
-    CEF_PACKAGE_EXTENSION="tar.bz2"
-    CEF_MD5="bb65f4382f8614683c1d6e7af27be9ae"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1364.gf6bf57b"
+    CEF_PACKAGE_EXTENSION="7z"
+    CEF_MD5="46f57f66ee9bcc03ce756e5813b88450"
     ;;
     "windows64")
     CEF_PLATFORM="windows64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1478.gaab5543"
-    CEF_PACKAGE_EXTENSION="tar.bz2"
-    CEF_MD5="d60bb74329860497d0b41d6454a92d15"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1364.gf6bf57b"
+    CEF_PACKAGE_EXTENSION="7z"
+    CEF_MD5="af4c640cb9fa386100cdc97fb5ba0f77"
     ;;
 esac
 CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
@@ -64,8 +64,16 @@ CEF_URL="http://depot.alchemyviewer.org/pub/cef/${CEF_ARCHIVE}"
 
 # Fetch and extract the cef archive
 fetch_archive "${CEF_URL}" "${CEF_ARCHIVE}" "${CEF_MD5}"
-extract ${CEF_ARCHIVE}
-mv "$CEF_FOLDER_NAME" "cef"
+case "${CEF_ARCHIVE}" in
+    *.7z)
+        7z x "$CEF_ARCHIVE"
+        mv "$CEF_FOLDER_NAME" "cef"
+    ;;
+    *.zip)
+        unzip "$CEF_ARCHIVE"
+        mv "$CEF_FOLDER_NAME" "cef"
+    ;;
+esac
 
 stage="$(pwd)/stage"
 echo "${CEF_VERSION_FULL}" > "${stage}/VERSION.txt"

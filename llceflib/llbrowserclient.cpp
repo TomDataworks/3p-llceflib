@@ -91,6 +91,17 @@ void LLBrowserClient::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     mBrowserList.push_back(browser);
 }
 
+bool LLBrowserClient::RunModal(CefRefPtr<CefBrowser> browser)
+{
+    CEF_REQUIRE_UI_THREAD();
+
+#ifdef LLCEFLIB_DEBUG
+    std::cout << "LLBrowserClient::RunModal" << std::endl;
+#endif
+
+    return false;
+}
+
 bool LLBrowserClient::DoClose(CefRefPtr<CefBrowser> browser)
 {
     CEF_REQUIRE_UI_THREAD();
@@ -137,7 +148,7 @@ void LLBrowserClient::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefStri
     mParent->onTitleChange(title_str);
 }
 
-void LLBrowserClient::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transition_type)
+void LLBrowserClient::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame)
 {
     CEF_REQUIRE_UI_THREAD();
     if (frame->IsMain())
