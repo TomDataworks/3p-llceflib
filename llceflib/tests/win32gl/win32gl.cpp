@@ -37,6 +37,7 @@
 
 using namespace std::placeholders;
 
+FILE* gConsole;
 int mAppWindowWidth = 1024;
 int mAppWindowHeight = 1024;
 const int gTextureWidth = 1024;
