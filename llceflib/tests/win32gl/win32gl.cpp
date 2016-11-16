@@ -151,6 +151,7 @@ void init(HWND hWnd)
     settings.accept_language_list = "en-US";
     settings.locale = "en-US";
     settings.debug_output = false;
+    settings.page_zoom_factor = 1.0;
 
     bool result = mLLCEFLib->init(settings);
     if (result)
@@ -223,13 +224,19 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     break;
                 }
 
-                case ID_TESTS_OPENDEVELOPERCONSOLE:
-                    mLLCEFLib->showDevTools(true);
-                    break;
+				case ID_TESTS_OPENDEVELOPERCONSOLE:
+					mLLCEFLib->showDevTools(true);
+					break;
 
-                case ID_TESTS_ABOUTCEF:
-                    mLLCEFLib->navigate(gCefAbout);
-                    break;
+				case ID_ZOOMPAGE_1X:
+					mLLCEFLib->setPageZoom(1.0);
+					break;
+				case ID_ZOOMPAGE_2X:
+					mLLCEFLib->setPageZoom(2.0);
+					break;
+				case ID_ZOOMPAGE_4X:
+					mLLCEFLib->setPageZoom(4.0);
+					break;
 
                 default:
                     return DefWindowProc(hWnd, uMsg, wParam, lParam);
