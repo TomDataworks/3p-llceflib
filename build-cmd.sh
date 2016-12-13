@@ -46,7 +46,7 @@ case "$AUTOBUILD_PLATFORM" in
     "darwin")
         pushd "cef"
             export GYP_GENERATORS=xcode GYP_DEFINES=mac_sdk=10.8
-            XCODE_FLAGS="-sdk macosx10.11 -mmacosx-version-min=10.8 -configuration Release"
+            XCODE_FLAGS="-sdk macosx10.12 -mmacosx-version-min=10.8 -configuration Release"
             #sh ./cef_create_projects.sh 
             cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" \
                 -DCMAKE_BUILD_TYPE=Release 
