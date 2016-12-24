@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CEF_NAME="llceflib"
-CEF_VERSION_MAIN="3.2785"
+CEF_VERSION_MAIN="3.2883"
 
 # turn on verbose debugging output for parabuild logs.
 set -x
@@ -29,7 +29,7 @@ pushd "${TOP}"
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
     CEF_PLATFORM="macosx64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1480.g162e9a9"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1540.gedbfb20"
     CEF_PACKAGE_EXTENSION="tar.bz2"
     CEF_MD5="81a9b86b1b7df09575fba80bb600e3e1"
     CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
@@ -38,7 +38,7 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     "linux")
     CEF_PLATFORM="linux32"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1480.g162e9a9"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1540.gedbfb20"
     CEF_PACKAGE_EXTENSION="zip"
     CEF_MD5="bce206a8b7cfe555dea3457c1c71d81e"
     CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
@@ -56,7 +56,7 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     "windows")
     CEF_PLATFORM="windows32"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1480.g162e9a9"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1540.gedbfb20"
     CEF_PACKAGE_EXTENSION="tar.bz2"
     CEF_MD5="d51f889d539072f78aaf0316d2734ca7"
     CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
@@ -65,9 +65,9 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     "windows64")
     CEF_PLATFORM="windows64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1480.g162e9a9"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1540.gedbfb20"
     CEF_PACKAGE_EXTENSION="tar.bz2"
-    CEF_MD5="ef277a308a75220472502b5899806553"
+    CEF_MD5="241e4317eaba9c8a8bdb2dd01791bcb9"
     CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
     CEF_ARCHIVE="${CEF_FOLDER_NAME}.${CEF_PACKAGE_EXTENSION}"
     CEF_URL="http://opensource.spotify.com/cefbuilds/${CEF_ARCHIVE}"
