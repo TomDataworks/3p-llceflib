@@ -97,6 +97,7 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 #endif
 
     CefSettings settings;
+	settings.multi_threaded_message_loop = false;
 #ifdef WIN32
     CefString(&settings.browser_subprocess_path) = "llceflib_host.exe";
 #elif __APPLE__
