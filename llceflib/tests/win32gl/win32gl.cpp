@@ -145,12 +145,13 @@ void init(HWND hWnd)
     settings.javascript_enabled = true;
     settings.cookies_enabled = true;
     settings.plugins_enabled = true;
-    settings.media_stream_enabled = true;
+    settings.media_stream_enabled = false;
     settings.cookie_store_path = "c:\\win32gl-cef-cookies";
     settings.user_agent_substring = mLLCEFLib->makeCompatibleUserAgentString("Win32GL");
     settings.accept_language_list = "en-US";
     settings.locale = "en-US";
     settings.debug_output = false;
+	settings.log_file = "c:\\win32gl-cef-cookies\\debug.log";
     settings.page_zoom_factor = 1.0;
 
     bool result = mLLCEFLib->init(settings);
@@ -236,6 +237,9 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					break;
 				case ID_ZOOMPAGE_4X:
 					mLLCEFLib->setPageZoom(4.0);
+					break;
+				case ID_TESTS_ABOUTCEF:
+					mLLCEFLib->navigate(gCefAbout);
 					break;
 
                 default:
@@ -333,8 +337,9 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void initConsole()
 {
 	AllocConsole();
-	freopen_s(&gConsole, "CON", "w", stdout);
-	freopen_s(&gConsole, "CON", "w", stderr);
+	freopen_s(&gConsole, "CONIN$", "r", stdin);
+	freopen_s(&gConsole, "CONOUT$", "w", stdout);
+	freopen_s(&gConsole, "CONOUT$", "w", stderr);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
