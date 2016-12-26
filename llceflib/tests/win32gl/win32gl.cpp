@@ -144,14 +144,16 @@ bool init(HWND hWnd)
     settings.initial_height = gTextureHeight;
     settings.javascript_enabled = true;
     settings.cookies_enabled = true;
+    settings.cache_enabled = true;
     settings.plugins_enabled = true;
     settings.media_stream_enabled = false;
-    settings.cookie_store_path = "c:\\win32gl-cef-cookies";
+    settings.cookie_store_path = "c:\\win32gl-cef\\cookies";
+    settings.cache_path = "c:\\win32gl-cef\\cache";
     settings.user_agent_substring = mLLCEFLib->makeCompatibleUserAgentString("Win32GL");
     settings.accept_language_list = "en-US";
     settings.locale = "en-US";
-    settings.debug_output = false;
-	settings.log_file = "c:\\win32gl-cef-cookies\\debug.log";
+    settings.debug_output = true;
+    settings.log_file = "c:\\win32gl-cef\\debug.log";
     settings.page_zoom_factor = 1.0;
 
     bool result = mLLCEFLib->init(settings);
