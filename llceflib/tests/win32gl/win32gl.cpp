@@ -51,6 +51,7 @@ unsigned char pixels[gTextureWidth * gTextureHeight * gTextureDepth];
 GLuint texture_handle = 0;
 const std::string gHomePage("https://callum-linden.s3.amazonaws.com/ceftests.html");
 const std::string gCefAbout("chrome://about");
+const std::string gAlchemyLogin("http://login.alchemyviewer.org");
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -221,6 +222,10 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
                 case ID_TESTS_NAVIGATEHOME:
                     mLLCEFLib->navigate(gHomePage);
+                    break;
+
+                case ID_TESTS_ALCHEMYLOGIN:
+                    mLLCEFLib->navigate(gAlchemyLogin);
                     break;
 
                 case ID_TESTS_SETACOOKIE:
