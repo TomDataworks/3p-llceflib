@@ -129,7 +129,7 @@ void onRequestExitCallback()
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-void init(HWND hWnd)
+bool init(HWND hWnd)
 {
     mLLCEFLib = new LLCEFLib();
 
@@ -158,7 +158,9 @@ void init(HWND hWnd)
     if (result)
     {
         mLLCEFLib->navigate(gHomePage);
+		return true;
     }
+	return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -407,7 +409,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, gTextureWidth, gTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    init(hWnd);
+	if (!init(hWnd))
+	{
+		while (60)
+		{
+			MSG msg;
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				};
+			}
+			else
+			{
+				SwapBuffers(hDC);
+			};
+		};
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(hRC);
+		ReleaseDC(hWnd, hDC);
+		DestroyWindow(hWnd);
+		UnregisterClass("Win32GL", hInstance);
+
+		closeConsole();
+		exit(0);
+		return 0;
+	}
 
     bool done = false;
     while (!done)
