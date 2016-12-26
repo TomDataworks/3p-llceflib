@@ -34,7 +34,6 @@
 #include "llbrowserclient.h"
 #include "llcontexthandler.h"
 
-#include "include/cef_runnable.h"
 #include "include/base/cef_bind.h"
 #include "include/wrapper/cef_closure_task.h"
 
@@ -98,8 +97,12 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 #endif
 
     CefSettings settings;
+    settings.no_sandbox = true;
+    settings.windowless_rendering_enabled = true;
 #ifdef WIN32
-    CefString(&settings.browser_subprocess_path) = "llceflib_host.exe";
+    settings.multi_threaded_message_loop = false;
+    std::string host("llceflib_host.exe");
+   cef_string_utf8_to_utf16(host.c_str(), host.size(), &settings.browser_subprocess_path);
 #elif __APPLE__
     NSString* appBundlePath = [[NSBundle mainBundle] bundlePath];
     CefString(&settings.browser_subprocess_path) = [[NSString stringWithFormat: @"%@/Contents/Frameworks/LLCefLib Helper.app/Contents/MacOS/LLCefLib Helper", appBundlePath] UTF8String];
@@ -119,31 +122,38 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 
     // change settings based on what was passed in
     // Only change user agent if user wants to
-    if (user_settings.user_agent_substring.length())
+    if (!user_settings.user_agent_substring.empty())
     {
         std::string user_agent(user_settings.user_agent_substring);
         cef_string_utf8_to_utf16(user_agent.c_str(), user_agent.size(), &settings.product_version);
     }
 
     // list of language locale codes used to configure the Accept-Language HTTP header value
-    std::string accept_language_list(user_settings.accept_language_list);
-    cef_string_utf8_to_utf16(accept_language_list.c_str(), accept_language_list.size(), &settings.accept_language_list);
+    if (!user_settings.accept_language_list.empty())
+    {
+        std::string accept_language_list(user_settings.accept_language_list);
+        cef_string_utf8_to_utf16(accept_language_list.c_str(), accept_language_list.size(), &settings.accept_language_list);
+    }
 
     // Set the proper locale for cef internals
-    std::string locale(user_settings.locale);
-    cef_string_utf8_to_utf16(locale.c_str(), locale.size(), &settings.locale);
+    if (!user_settings.locale.empty())
+    {
+        std::string locale(user_settings.locale);
+        cef_string_utf8_to_utf16(locale.c_str(), locale.size(), &settings.locale);
+    }
 
     // set path to cache if enabled and set
-    if (user_settings.cache_enabled && user_settings.cache_path.length())
+    if (user_settings.cache_enabled && !user_settings.cache_path.empty())
     {
         std::string cache_path(user_settings.cache_path);
         cef_string_utf8_to_utf16(cache_path.c_str(), cache_path.size(), &settings.cache_path);
     }
 
     // Control logging output and location
-    settings.log_severity = user_settings.debug_output ? LOGSEVERITY_VERBOSE : LOGSEVERITY_DISABLE;
-    if (user_settings.debug_output)
+    settings.log_severity = LOGSEVERITY_DISABLE;
+    if (user_settings.debug_output && !user_settings.log_file.empty())
     {
+        settings.log_severity = LOGSEVERITY_VERBOSE;
         std::string log_file(user_settings.log_file);
         cef_string_utf8_to_utf16(log_file.c_str(), log_file.size(), &settings.log_file);
     }
@@ -200,7 +210,7 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
 #elif __APPLE__ || __linux__
         std::string cookiePath = "./cookies";
 #endif
-        if (user_settings.cookie_store_path.length())
+        if (!user_settings.cookie_store_path.empty())
         {
             cookiePath = std::string(user_settings.cookie_store_path);
         }
@@ -208,9 +218,9 @@ bool LLCEFLibImpl::init(LLCEFLib::LLCEFLibSettings& user_settings)
         mContextHandler = new LLContextHandler(cookiePath.c_str());
 
         CefRequestContextSettings contextSettings;
-        if (user_settings.cache_enabled && user_settings.cache_path.length())
+        if (user_settings.cache_enabled && !user_settings.cache_path.empty())
         {
-            CefString(&contextSettings.cache_path) = user_settings.cache_path;
+            cef_string_utf8_to_utf16(user_settings.cache_path.c_str(), user_settings.cache_path.size(), &contextSettings.cache_path);
         }
         rc = CefRequestContext::CreateContext(contextSettings, mContextHandler.get());
     }
@@ -790,8 +800,12 @@ std::string LLCEFLibImpl::makeCompatibleUserAgentString(const std::string base)
     std::string frag = "(" + base + ")" + " Chrome/";
 #ifdef WIN32
     frag += CEF_CHROME_VERSION_WIN;
-#else
+#elif __linux__
+	frag += CEF_CHROME_VERSION_LINUX;
+#elif __APPLE__
     frag += CEF_CHROME_VERSION_OSX;
+#else
+#error "Platform not supported.
 #endif
     return frag;
 }

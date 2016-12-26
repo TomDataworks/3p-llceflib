@@ -129,7 +129,7 @@ void onRequestExitCallback()
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-void init(HWND hWnd)
+bool init(HWND hWnd)
 {
     mLLCEFLib = new LLCEFLib();
 
@@ -144,20 +144,25 @@ void init(HWND hWnd)
     settings.initial_height = gTextureHeight;
     settings.javascript_enabled = true;
     settings.cookies_enabled = true;
+    settings.cache_enabled = true;
     settings.plugins_enabled = true;
-    settings.media_stream_enabled = true;
-    settings.cookie_store_path = "c:\\win32gl-cef-cookies";
+    settings.media_stream_enabled = false;
+    settings.cookie_store_path = "c:\\win32gl-cef\\cookies";
+    settings.cache_path = "c:\\win32gl-cef\\cache";
     settings.user_agent_substring = mLLCEFLib->makeCompatibleUserAgentString("Win32GL");
     settings.accept_language_list = "en-US";
     settings.locale = "en-US";
-    settings.debug_output = false;
+    settings.debug_output = true;
+    settings.log_file = "c:\\win32gl-cef\\debug.log";
     settings.page_zoom_factor = 1.0;
 
     bool result = mLLCEFLib->init(settings);
     if (result)
     {
         mLLCEFLib->navigate(gHomePage);
+		return true;
     }
+	return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -236,6 +241,9 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					break;
 				case ID_ZOOMPAGE_4X:
 					mLLCEFLib->setPageZoom(4.0);
+					break;
+				case ID_TESTS_ABOUTCEF:
+					mLLCEFLib->navigate(gCefAbout);
 					break;
 
                 default:
@@ -333,8 +341,9 @@ LRESULT CALLBACK window_proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void initConsole()
 {
 	AllocConsole();
-	freopen_s(&gConsole, "CON", "w", stdout);
-	freopen_s(&gConsole, "CON", "w", stderr);
+	freopen_s(&gConsole, "CONIN$", "r", stdin);
+	freopen_s(&gConsole, "CONOUT$", "w", stdout);
+	freopen_s(&gConsole, "CONOUT$", "w", stderr);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +411,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, gTextureWidth, gTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    init(hWnd);
+	if (!init(hWnd))
+	{
+		while (60)
+		{
+			MSG msg;
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				};
+			}
+			else
+			{
+				SwapBuffers(hDC);
+			};
+		};
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(hRC);
+		ReleaseDC(hWnd, hDC);
+		DestroyWindow(hWnd);
+		UnregisterClass("Win32GL", hInstance);
+
+		closeConsole();
+		exit(0);
+		return 0;
+	}
 
     bool done = false;
     while (!done)

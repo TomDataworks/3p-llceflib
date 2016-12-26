@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CEF_NAME="llceflib"
-CEF_VERSION_MAIN="3.2526"
+CEF_VERSION_MAIN="3.2840"
 
 # turn on verbose debugging output for parabuild logs.
 set -x
@@ -29,51 +29,55 @@ pushd "${TOP}"
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
     CEF_PLATFORM="macosx64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1364.gf6bf57b"
-    CEF_PACKAGE_EXTENSION="7z"
-    CEF_MD5="e46f9d00a6950bc0268a03fa24d4ec80"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1518.gffd843c"
+    CEF_PACKAGE_EXTENSION="tar.bz2"
+    CEF_MD5="81a9b86b1b7df09575fba80bb600e3e1"
+    CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
+    CEF_ARCHIVE="${CEF_FOLDER_NAME}.${CEF_PACKAGE_EXTENSION}"
+    CEF_URL="http://opensource.spotify.com/cefbuilds/${CEF_ARCHIVE}"
     ;;
     "linux")
     CEF_PLATFORM="linux32"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1364.gf6bf57b"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1540.gedbfb20"
     CEF_PACKAGE_EXTENSION="zip"
     CEF_MD5="bce206a8b7cfe555dea3457c1c71d81e"
+    CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
+    CEF_ARCHIVE="${CEF_FOLDER_NAME}.${CEF_PACKAGE_EXTENSION}"
+    CEF_URL="http://depot.alchemyviewer.org/pub/cef/${CEF_ARCHIVE}"
     ;;
     "linux64")
     CEF_PLATFORM="linux64"
     CEF_VERSION_FULL="3.2526.1373.gb660893"
     CEF_PACKAGE_EXTENSION="zip"
     CEF_MD5="e460d5f628e231f349be4a9521c2786b"
+    CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
+    CEF_ARCHIVE="${CEF_FOLDER_NAME}.${CEF_PACKAGE_EXTENSION}"
+    CEF_URL="http://depot.alchemyviewer.org/pub/cef/${CEF_ARCHIVE}"
     ;;
     "windows")
     CEF_PLATFORM="windows32"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1364.gf6bf57b"
-    CEF_PACKAGE_EXTENSION="7z"
-    CEF_MD5="46f57f66ee9bcc03ce756e5813b88450"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1518.gffd843c"
+    CEF_PACKAGE_EXTENSION="tar.bz2"
+    CEF_MD5="d51f889d539072f78aaf0316d2734ca7"
+    CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
+    CEF_ARCHIVE="${CEF_FOLDER_NAME}.${CEF_PACKAGE_EXTENSION}"
+    CEF_URL="http://opensource.spotify.com/cefbuilds/${CEF_ARCHIVE}"
     ;;
     "windows64")
     CEF_PLATFORM="windows64"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1364.gf6bf57b"
-    CEF_PACKAGE_EXTENSION="7z"
-    CEF_MD5="af4c640cb9fa386100cdc97fb5ba0f77"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1518.gffd843c"
+    CEF_PACKAGE_EXTENSION="tar.bz2"
+    CEF_MD5="93a97a39b40911eabf776319b9923c67"
+    CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
+    CEF_ARCHIVE="${CEF_FOLDER_NAME}.${CEF_PACKAGE_EXTENSION}"
+    CEF_URL="http://opensource.spotify.com/cefbuilds/${CEF_ARCHIVE}"
     ;;
 esac
-CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
-CEF_ARCHIVE="${CEF_FOLDER_NAME}.${CEF_PACKAGE_EXTENSION}"
-CEF_URL="http://depot.alchemyviewer.org/pub/cef/${CEF_ARCHIVE}"
 
 # Fetch and extract the cef archive
 fetch_archive "${CEF_URL}" "${CEF_ARCHIVE}" "${CEF_MD5}"
-case "${CEF_ARCHIVE}" in
-    *.7z)
-        7z x "$CEF_ARCHIVE"
-        mv "$CEF_FOLDER_NAME" "cef"
-    ;;
-    *.zip)
-        unzip "$CEF_ARCHIVE"
-        mv "$CEF_FOLDER_NAME" "cef"
-    ;;
-esac
+extract ${CEF_ARCHIVE}
+mv "$CEF_FOLDER_NAME" "cef"
 
 stage="$(pwd)/stage"
 echo "${CEF_VERSION_FULL}" > "${stage}/VERSION.txt"

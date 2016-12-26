@@ -16,8 +16,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(MSVC)
-  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Debug/libcef_dll_wrapper.lib
-               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Release/libcef_dll_wrapper.lib
+  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll_wrapper/Debug/libcef_dll_wrapper.lib
+               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll_wrapper/Release/libcef_dll_wrapper.lib
                debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.lib
                optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.lib)
 elseif(APPLE)
