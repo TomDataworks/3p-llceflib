@@ -19,17 +19,10 @@ elseif (APPLE)
   target_link_libraries(llceflib_host ${CEF_LIBS} ${CEF_FRAMEWORK} ${LIBCEF_LIBRARY})
   set_target_properties(llceflib_host PROPERTIES
       OUTPUT_NAME "LLCefLib Helper"
-      MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in")
+      MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+      INSTALL_RPATH "@executable_path/../../../.."
+      BUILD_WITH_INSTALL_RPATH TRUE)
 
-  # This command kinda sucks, but well... I'm entirely sick of this.
-  add_custom_command(TARGET llceflib_host
-    POST_BUILD
-    COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "@executable_path/Chromium Embedded Framework"
-            "@executable_path/../../../../Frameworks/Chromium Embedded Framework.framework/Chromium Embedded Framework"
-            "$<TARGET_FILE:llceflib_host>"
-    VERBATIM
-    COMMENT "Fixing path to CEF Framework"
-    )
 elseif (UNIX)
   target_link_libraries(llceflib_host ${CEF_LIBS})
 endif ()
