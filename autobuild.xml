@@ -1,6 +1,193 @@
 <?xml version="1.0" ?>
 <llsd>
 <map>
+    <key>installables</key>
+    <map>
+      <key>libpng</key>
+      <map>
+        <key>copyright</key>
+        <string>Copyright (c) 2004, 2006-2016 Glenn Randers-Pehrson</string>
+        <key>description</key>
+        <string>PNG Reference library</string>
+        <key>license</key>
+        <string>libpng</string>
+        <key>license_file</key>
+        <string>LICENSES/libpng.txt</string>
+        <key>name</key>
+        <string>libpng</string>
+        <key>platforms</key>
+        <map>
+          <key>linux</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>5864e1e47b3a7c63214d64a9d9458dea</string>
+              <key>hash_algorithm</key>
+              <string>md5</string>
+              <key>url</key>
+              <string>http://dwaggy.tk/singularity/libpng-1.6.24-linux-201609111711.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux</string>
+          </map>
+        </map>
+        <key>version</key>
+        <string>1.6.21</string>
+      </map>
+      <key>zlib</key>
+      <map>
+        <key>copyright</key>
+        <string>Copyright (C) 1995-2013 Jean-loup Gailly and Mark Adler</string>
+        <key>description</key>
+        <string>Zlib Data Compression Library</string>
+        <key>license</key>
+        <string>zlib</string>
+        <key>license_file</key>
+        <string>LICENSES/zlib.txt</string>
+        <key>name</key>
+        <string>zlib</string>
+        <key>platforms</key>
+        <map>
+          <key>linux</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>873be966974a0873c31f6e51b231774e</string>
+              <key>url</key>
+              <string>http:/dwaggy.tk/singularity/zlib-1.2.8-linux-201609111523.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux</string>
+          </map>
+        </map>
+        <key>version</key>
+        <string>1.2.8</string>
+      </map>
+      <key>expat</key>
+      <map>
+        <key>copyright</key>
+        <string>Copyright (c) 1998, 1999, 2000 Thai Open Source Software Center Ltd and Clark Cooper - Copyright (c) 2001, 2008</string>
+        <key>description</key>
+        <string>Expat is an XML parser library written in C</string>
+        <key>license</key>
+        <string>expat</string>
+        <key>license_file</key>
+        <string>LICENSES/expat.txt</string>
+        <key>name</key>
+        <string>expat</string>
+        <key>platforms</key>
+        <map>
+          <key>linux</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>158cc3f97432d3fc2e8d88a61ca19eae</string>
+              <key>url</key>
+              <string>http://dwaggy.tk/singularity/expat-2.2.0-linux-201609111705.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux</string>
+          </map>
+        </map>
+        <key>version</key>
+        <string>2.1.1</string>
+      </map>
+      <key>fontconfig</key>
+      <map>
+        <key>copyright</key>
+        <string>Copyright (C) 2000,2001,2002,2003,2004,2006,2007 Keith Packard, 2005 Patrick Lam, 2009 Roozbeh Pournader, 2008</string>
+        <key>description</key>
+        <string>Fontconfig is a library for configuring and customizing font access.</string>
+        <key>license</key>
+        <string>bsd</string>
+        <key>license_file</key>
+        <string>LICENSES/fontconfig.txt</string>
+        <key>name</key>
+        <string>fontconfig</string>
+        <key>platforms</key>
+        <map>
+          <key>linux</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>4fbbccd96c702ffad52d985bd408cc99</string>
+              <key>url</key>
+              <string>http://dwaggy.tk/singularity/fontconfig-2.11.0-linux-201609111801.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux</string>
+          </map>
+        </map>
+        <key>version</key>
+        <string>2.11.0</string>
+      </map>
+      <key>freetype</key>
+      <map>
+        <key>copyright</key>
+        <string>Copyright 2006-2016 by David Turner, Robert Wilhelm, and Werner Lemberg.</string>
+        <key>description</key>
+        <string>Font rendering library</string>
+        <key>license</key>
+        <string>FreeType</string>
+        <key>license_file</key>
+        <string>LICENSES/freetype.txt</string>
+        <key>name</key>
+        <string>freetype</string>
+        <key>platforms</key>
+        <map>
+          <key>linux</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>ee0c9720e3c7dd26476d700dcfb25e2f</string>
+              <key>hash_algorithm</key>
+              <string>md5</string>
+              <key>url</key>
+              <string>http://dwaggy.tk/singularity/freetype-2.6.3-linux-201609111744.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux</string>
+          </map>
+        </map>
+        <key>version</key>
+        <string>2.6.3</string>
+      </map>
+      <key>gtk-atk-pango-glib</key>
+      <map>
+        <key>copyright</key>
+        <string>Copyright various(See license file)</string>
+        <key>description</key>
+        <string>gtk-atk-pango-glib</string>
+        <key>license</key>
+        <string>lgpl</string>
+        <key>license_file</key>
+        <string>LICENSES/gtk-atk-pango-glib.txt</string>
+        <key>name</key>
+        <string>gtk-atk-pango-glib</string>
+        <key>platforms</key>
+        <map>
+          <key>linux</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>02a2879ee5b1878fddf3c0581bad0db7</string>
+              <key>url</key>
+              <string>http://dwaggy.tk/singularity/gtk_atk_pango_glib-1.6.24-linux-201609111711.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux</string>
+          </map>
+        </map>
+        <key>version</key>
+        <string>1.2.15</string>
+      </map>
+    </map>
     <key>package_description</key>
     <map>
       <key>copyright</key>
@@ -90,6 +277,13 @@
               <string>default</string>
             </map>
           </map>
+          <key>manifest</key>
+          <array>
+            <string>bin/release/*</string>
+            <string>bin/debug/*</string>
+            <string>lib/release/*</string>
+            <string>lib/debug/*</string>
+          </array>
           <key>name</key>
           <string>linux</string>
         </map>
