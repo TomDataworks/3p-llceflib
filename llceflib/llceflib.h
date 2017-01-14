@@ -40,12 +40,12 @@ class LLCEFLibImpl;
 const std::string LLCEFLIB_BASE_VERSION = "1.6.0";
 
 // version of CEF and the version of Chrome it represents on Windows
-const std::string CEF_VERSION_WIN = "(CEF-WIN-3.2526.1364)";
-const std::string CEF_CHROME_VERSION_WIN = "47.0.2526.80";
+const std::string CEF_VERSION_WIN = "(CEF-WIN-3.2840.1518)";
+const std::string CEF_CHROME_VERSION_WIN = "54.0.2840.99";
 
 // version of CEF and the version of Chrome it represents on OS X
-const std::string CEF_VERSION_OSX = "(CEF-OSX-3.2526.1364)";
-const std::string CEF_CHROME_VERSION_OSX = "47.0.2526.80";
+const std::string CEF_VERSION_OSX = "(CEF-OSX-3.2840.1518)";
+const std::string CEF_CHROME_VERSION_OSX = "54.0.2840.99";
 
 // version of CEF and the version of Chrome it represents on Linux
 const std::string CEF_VERSION_LINUX = "(CEF-OSX-3.2526.1368)";
@@ -97,6 +97,9 @@ class LLCEFLib
 
             // locale to use for pak file
             std::string locale = "en-US";
+
+            // initial page zoom factor in linear units (not CEF units)
+            double page_zoom_factor = 1.0;
         };
 
         // keyboard event types

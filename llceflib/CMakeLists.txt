@@ -7,6 +7,8 @@ include("macros")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -16,13 +18,13 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(MSVC)
-  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Debug/libcef_dll_wrapper.lib
-               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll/Release/libcef_dll_wrapper.lib
+  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll_wrapper/Debug/libcef_dll_wrapper.lib
+               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/build/libcef_dll_wrapper/Release/libcef_dll_wrapper.lib
                debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/libcef.lib
                optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/libcef.lib)
 elseif(APPLE)
-  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/libcef_dll/Debug/libcef_dll_wrapper.a
-               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/libcef_dll/Release/libcef_dll_wrapper.a
+  set(CEF_LIBS debug ${CMAKE_CURRENT_SOURCE_DIR}/../cef/libcef_dll_wrapper/Debug/libcef_dll_wrapper.a
+               optimized ${CMAKE_CURRENT_SOURCE_DIR}/../cef/libcef_dll_wrapper/Release/libcef_dll_wrapper.a
                debug "${CMAKE_CURRENT_SOURCE_DIR}/../cef/Debug/Chromium Embedded Framework.framework"
                optimized "${CMAKE_CURRENT_SOURCE_DIR}/../cef/Release/Chromium Embedded Framework.framework")
 elseif(UNIX)
@@ -33,6 +35,7 @@ elseif(UNIX)
 endif()
 
 if(APPLE)
+  set(CMAKE_CXX_COMPILER "clang++")
   set(CMAKE_CXX_FLAGS "-x objective-c++")
 endif(APPLE)
 

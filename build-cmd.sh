@@ -45,16 +45,16 @@ mkdir -p "$stage/resources"
 case "$AUTOBUILD_PLATFORM" in
     "darwin")
         pushd "cef"
-            export GYP_GENERATORS=xcode GYP_DEFINES=mac_sdk=10.8
-            XCODE_FLAGS="-sdk macosx10.11 -mmacosx-version-min=10.8 -configuration Release"
+            export GYP_GENERATORS=xcode
+            XCODE_FLAGS="-sdk macosx10.12 -configuration Release"
             #sh ./cef_create_projects.sh 
             cmake -G "Xcode" . -DPROJECT_ARCH="x86_64" \
-                -DCMAKE_BUILD_TYPE=Release 
+                -DCMAKE_BUILD_TYPE=Release
             xcodebuild -target libcef_dll_wrapper ${XCODE_FLAGS}
             xcodebuild -target "cefclient Helper" ${XCODE_FLAGS}
 
             cp -R cefclient/resources/* "${stage}/resources"
-            cp libcef_dll/Release/libcef_dll_wrapper.a "${stage_lib_release}"
+            cp libcef_dll_wrapper/Release/libcef_dll_wrapper.a "${stage_lib_release}"
             cp -R Release/"Chromium Embedded Framework.framework" "${stage_lib_release}"
             cp -R cefclient/Release/"cefclient Helper.app" "${stage_bin_release}"
         popd
@@ -112,21 +112,22 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     "windows")
         pushd "cef"
-            sed -i -- 's/\/MT/\/MD/' CMakeLists.txt
-            sed -i -- 's/\/wd\\\"4244\\\"/\/wd\\\"4244\\\"\ \/wd\\\"4456\\\"\ \/wd\\\"4458\\\"/' CMakeLists.txt
+            pushd "cmake"
+                sed -i -- 's/\/MT/\/MD/' cef_variables.cmake
+            popd
             mkdir -p build
             pushd "build"
                 cmake -G "Visual Studio 14" ..
-                build_sln "cef.sln" "Debug" "Win32" "libcef_dll_wrapper"
+                #build_sln "cef.sln" "Debug" "Win32" "libcef_dll_wrapper"
                 build_sln "cef.sln" "Release" "Win32" "libcef_dll_wrapper"
                 
-                cp libcef_dll/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
-                cp libcef_dll/Release/libcef_dll_wrapper.* "$stage_lib_release"
+                #cp libcef_dll_wrapper/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
+                cp libcef_dll_wrapper/Release/libcef_dll_wrapper.* "$stage_lib_release"
             popd
-            cp Debug/*.bin "$stage_bin_debug"
-            cp Debug/*.dll "$stage_bin_debug"
-            cp Debug/*.exe "$stage_bin_debug"
-            cp Debug/libcef.lib "$stage_lib_debug"
+            #cp Debug/*.bin "$stage_bin_debug"
+            #cp Debug/*.dll "$stage_bin_debug"
+            #cp Debug/*.exe "$stage_bin_debug"
+            #cp Debug/libcef.lib "$stage_lib_debug"
             cp Release/*.bin "$stage_bin_release"
             cp Release/*.dll "$stage_bin_release"
             cp Release/*.exe "$stage_bin_release"
@@ -137,34 +138,35 @@ case "$AUTOBUILD_PLATFORM" in
             mkdir -p build
             pushd "build"
                 cmake -G "Visual Studio 14" ..
-                build_sln "llceflib.sln" "Debug" "Win32"
+                #build_sln "llceflib.sln" "Debug" "Win32"
                 build_sln "llceflib.sln" "Release" "Win32"
                 
-                cp "lib/Debug/llceflib.lib" "$stage_lib_debug"
-                cp "lib/Debug/llceflib.pdb" "$stage_lib_debug"
+                #cp "lib/Debug/llceflib.lib" "$stage_lib_debug"
+                #cp "lib/Debug/llceflib.pdb" "$stage_lib_debug"
                 cp "lib/Release/llceflib.lib" "$stage_lib_release"
                 
-                cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
+                #cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
                 cp "bin/Release/llceflib_host.exe" "$stage_bin_release"
             popd
         popd
     ;;
     "windows64")
         pushd "cef"
-            sed -i -- 's/\/MT/\/MD/' CMakeLists.txt
-            sed -i -- 's/\/wd\\\"4244\\\"/\/wd\\\"4244\\\"\ \/wd\\\"4456\\\"\ \/wd\\\"4458\\\"/' CMakeLists.txt
+            pushd "cmake"
+                sed -i -- 's/\/MT/\/MD/' cef_variables.cmake
+            popd
             mkdir -p build
             pushd "build"
                 cmake -G "Visual Studio 14 Win64" ..
-                build_sln "cef.sln" "Debug" "x64" "libcef_dll_wrapper"
+                #build_sln "cef.sln" "Debug" "x64" "libcef_dll_wrapper"
                 build_sln "cef.sln" "Release" "x64" "libcef_dll_wrapper"
                 
-                cp libcef_dll/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
-                cp libcef_dll/Release/libcef_dll_wrapper.* "$stage_lib_release"
+                #cp libcef_dll_wrapper/Debug/libcef_dll_wrapper.* "$stage_lib_debug"
+                cp libcef_dll_wrapper/Release/libcef_dll_wrapper.* "$stage_lib_release"
             popd
-            cp Debug/*.dll "$stage_bin_debug"
-            cp Debug/*.bin "$stage_bin_debug"
-            cp Debug/libcef.lib "$stage_lib_debug"
+            #cp Debug/*.dll "$stage_bin_debug"
+            #cp Debug/*.bin "$stage_bin_debug"
+            #cp Debug/libcef.lib "$stage_lib_debug"
             cp Release/*.dll "$stage_bin_release"
             cp Release/*.bin "$stage_bin_release"
             cp Release/libcef.lib "$stage_lib_release"
@@ -174,14 +176,14 @@ case "$AUTOBUILD_PLATFORM" in
             mkdir -p build
             pushd "build"
                 cmake -G "Visual Studio 14 Win64" ..
-                build_sln "llceflib.sln" "Debug" "x64"
+                #build_sln "llceflib.sln" "Debug" "x64"
                 build_sln "llceflib.sln" "Release" "x64"
                 
-                cp "lib/Debug/llceflib.lib" "$stage_lib_debug"
-                cp "lib/Debug/llceflib.pdb" "$stage_lib_debug"
+                #cp "lib/Debug/llceflib.lib" "$stage_lib_debug"
+                #cp "lib/Debug/llceflib.pdb" "$stage_lib_debug"
                 cp "lib/Release/llceflib.lib" "$stage_lib_release"
                 
-                cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
+                #cp "bin/Debug/llceflib_host.exe" "$stage_bin_debug"
                 cp "bin/Release/llceflib_host.exe" "$stage_bin_release"
             popd
         popd

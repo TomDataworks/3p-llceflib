@@ -327,9 +327,7 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>bin/debug/*</string>
             <string>bin/release/*</string>
-            <string>lib/debug/*</string>
             <string>lib/release/*</string>
           </array>
           <key>name</key>
@@ -351,9 +349,7 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>bin/debug/*</string>
             <string>bin/release/*</string>
-            <string>lib/debug/*</string>
             <string>lib/release/*</string>
           </array>
           <key>name</key>

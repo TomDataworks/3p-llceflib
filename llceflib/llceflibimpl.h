@@ -180,6 +180,9 @@ class LLCEFLibImpl :
         const int mViewDepth = 4;
         bool mSystemFlashEnabled;
         bool mMediaStreamEnabled;
+
+		double mRequestedZoom;
+
         std::vector<std::string> mCustomSchemes;
         std::function<void(unsigned char*, int, int, int, int, bool)> mOnPageChangedCallbackFunc;
         std::function<void(std::string)> mOnCustomSchemeURLCallbackFunc;
@@ -195,6 +198,9 @@ class LLCEFLibImpl :
         std::function<const std::string()> mOnFileDialogCallbackFunc;
         std::function<void()> mOnRequestExitCallbackFunc;
         std::function<void(LLCEFLib::ECursorType type, unsigned int cursor)> mOnCursorChangedCallbackFunc;
+
+		void convertInputCoords(int& x, int& y);
+		double convertZoomLevel(double linear_zoom);
 
         CefRefPtr<FlushStoreCallback> mFlushStoreCallback;
 
