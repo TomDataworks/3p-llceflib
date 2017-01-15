@@ -534,7 +534,7 @@ void LLCEFLibImpl::setPageZoom(double zoom_val)
 void LLCEFLibImpl::mouseButton(LLCEFLib::EMouseButton mouse_button, LLCEFLib::EMouseEvent mouse_event, int x, int y)
 {
 	// modify coords based on rules (Y flipped, scaled etc.)
-	convertInputCoords(x, y);
+	// convertInputCoords(x, y);
 
     // select click location
     CefMouseEvent cef_mouse_event;
@@ -582,7 +582,7 @@ void LLCEFLibImpl::mouseButton(LLCEFLib::EMouseButton mouse_button, LLCEFLib::EM
 void LLCEFLibImpl::mouseMove(int x, int y)
 {
 	// modify coords based on rules (Y flipped, scaled etc.)
-	convertInputCoords(x, y);
+	// convertInputCoords(x, y);
 
     CefMouseEvent mouse_event;
     mouse_event.x = x;

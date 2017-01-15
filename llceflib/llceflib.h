@@ -48,8 +48,8 @@ const std::string CEF_VERSION_OSX = "(CEF-OSX-3.2840.1518)";
 const std::string CEF_CHROME_VERSION_OSX = "54.0.2840.99";
 
 // version of CEF and the version of Chrome it represents on Linux
-const std::string CEF_VERSION_LINUX = "(CEF-OSX-3.2526.1368)";
-const std::string CEF_CHROME_VERSION_LINUX = "47.0.2526.111";
+const std::string CEF_VERSION_LINUX = "(CEF-LIN-3.2840.1518)";
+const std::string CEF_CHROME_VERSION_LINUX = "54.0.2840.99";
 
 // composite version for display
 #ifdef WIN32
