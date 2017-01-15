@@ -22,11 +22,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>5864e1e47b3a7c63214d64a9d9458dea</string>
+              <string>fc96638a537b9d8fea3337ee53c18d28</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://dwaggy.tk/singularity/libpng-1.6.24-linux-201609111711.tar.bz2</string>
+              <string>http://dwaggy.tk/singularity/libpng-1.6.28-linux-201701132146.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux</string>
@@ -176,9 +176,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>02a2879ee5b1878fddf3c0581bad0db7</string>
+              <string>c56ee419cc7a8ed5dc7af24cee6c8763</string>
               <key>url</key>
-              <string>http://dwaggy.tk/singularity/gtk_atk_pango_glib-1.6.24-linux-201609111711.tar.bz2</string>
+              <string>http://dwaggy.tk/singularity/gtk_atk_pango_glib-0.0.3-linux-201701132244.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux</string>

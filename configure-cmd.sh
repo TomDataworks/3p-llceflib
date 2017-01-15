@@ -38,12 +38,12 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     "linux")
     CEF_PLATFORM="linux32"
-    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1540.gedbfb20"
-    CEF_PACKAGE_EXTENSION="zip"
-    CEF_MD5="bce206a8b7cfe555dea3457c1c71d81e"
+    CEF_VERSION_FULL="${CEF_VERSION_MAIN}.1518.gffd843c"
+    CEF_PACKAGE_EXTENSION="tar.bz2"
+    CEF_MD5="d9f5cf8eadcc76dfb2d77b1ff92002f8"
     CEF_FOLDER_NAME="cef_binary_${CEF_VERSION_FULL}_${CEF_PLATFORM}"
     CEF_ARCHIVE="${CEF_FOLDER_NAME}.${CEF_PACKAGE_EXTENSION}"
-    CEF_URL="http://depot.alchemyviewer.org/pub/cef/${CEF_ARCHIVE}"
+    CEF_URL="http://opensource.spotify.com/cefbuilds/${CEF_ARCHIVE}"
     ;;
     "linux64")
     CEF_PLATFORM="linux64"
